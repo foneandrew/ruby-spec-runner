@@ -1,6 +1,6 @@
 {
   "name": "spec-runner",
-	"displayName": "SpecRunner",
+	"displayName": "Ruby Spec Runner",
 	"description": "Run specific rspec tests from vscode",
 	"version": "0.0.1",
 	"engines": {
@@ -10,16 +10,56 @@
 		"Other"
 	],
 	"activationEvents": [
-        "onCommand:spec-runner.helloWorld"
+		"onLanguage:ruby"
 	],
 	"main": "./dist/extension.js",
 	"contributes": {
 		"commands": [
 			{
-				"command": "spec-runner.helloWorld",
-				"title": "Hello World"
+        "command": "extension.runSpec",
+        "title": "Ruby Spec Runner: Run this spec"
+      }
+		],
+		"keybindings": [
+			{
+				"command": "extension.runSpec",
+				"key": "ctrl+alt+/",
+				"mac": "ctrl+cmd+/"
 			}
-		]
+		],
+		"configuration": {
+			"title": "Ruby Spec Runner",
+			"properties": {
+				"spec-runner.rspecCommand": {
+					"type": "string",
+					"default": "",
+					"description": "Provide an alternative rspec command (eg different path to rspec or run with env vars)",
+					"scope": "window"
+				},
+				"spec-runner.changeDirectoryToWorkspaceRoot": {
+					"type": "boolean",
+					"default": true,
+					"description": "Changes directory to workspace root before running the spec",
+					"scope": "window"
+				},
+				"spec-runner.projectPath": {
+					"type": "string",
+					"default": "",
+					"description": "Absolute path to project directory (e.g. /home/me/project/sub-folder)",
+					"scope": "window"
+				},
+				"spec-runner.rspecFormat": {
+					"type": "string",
+					"enum": [
+						"Documentation",
+						"Progress"
+					],
+					"default": "Progress",
+					"markdownDescription": "Output format for rspec.\n\n- **Documentation:** group and example names\n- **Progress:** dots for each example",
+					"scope": "window"
+				}
+			}
+		}
 	},
 	"scripts": {
 		"vscode:prepublish": "yarn run package",

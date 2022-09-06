@@ -1,5 +1,7 @@
 # spec-runner README
 
+**This extension is very heavily inspired by the incredible vscode-jest-runner extension. Like a whole bunch of it is straight up copied.**
+
 This is the README for your extension "spec-runner". After writing up a brief description, we recommend including the following sections.
 
 ## Features
