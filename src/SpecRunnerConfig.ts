@@ -29,6 +29,13 @@ export class SpecRunnerConfig {
     };
   }
 
+  get saveBeforeRunning(): boolean {
+    const result = vscode.workspace.getConfiguration().get('spec-runner.saveBeforeRunning') as boolean | undefined;
+    // eslint-disable-next-line eqeqeq
+    if (result == null) { return false; }
+    return result;
+  }
+
   private get currentWorkspaceFolderPath(): string {
     const editor = vscode.window.activeTextEditor;
     if (!editor?.document.uri || !vscode.workspace.getWorkspaceFolder(editor.document.uri)) {

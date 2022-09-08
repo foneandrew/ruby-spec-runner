@@ -2,16 +2,25 @@ import * as vscode from 'vscode';
 import { CodeLensCommandArg } from './SpecRunnerCodeLensProvider';
 import SpecRunnerConfig from './SpecRunnerConfig';
 import { cmdJoin, quote } from './util';
+import SpecResultPresenter from './SpecResultPresenter';
 
 export class SpecRunner {
   private _term!: vscode.Terminal;
   private config: SpecRunnerConfig;
+  private outputFilePath: string;
+  private presenter: SpecResultPresenter;
 
-  constructor(config: SpecRunnerConfig) {
+  constructor(config: SpecRunnerConfig, outputFilePath: string, presenter: SpecResultPresenter) {
     this.config = config;
+    this.outputFilePath = outputFilePath;
+    this.presenter = presenter;
   }
 
   async runSpec(arg?: CodeLensCommandArg) {
+    if (this.config.saveBeforeRunning) {
+      await vscode.commands.executeCommand('workbench.action.files.save');
+    }
+
     if (arg?.fileName) {
       this.runSpecForFile(arg.fileName, arg.line, arg.name);
     } else {
@@ -23,6 +32,7 @@ export class SpecRunner {
     try {
       const command = this.buildRspecCommand(fileName, line, testName);
       this.runTerminalCommand(command);
+      this.presenter.setPending(fileName);
     } catch (error: any) {
       if (error?.name === 'NoWorkspaceError') {
         console.error('SpecRunner: Unable to run spec as no workspace is open.', error);
@@ -48,8 +58,8 @@ export class SpecRunner {
     const cdCommand = this.buildChangeDirectoryToWorkspaceRootCommand();
     const file = line ? [fileName, ':', line].join('') : fileName;
     const format = `-f ${this.config.rspecFormat}`;
-    const rspecCommand = `${this.config.rspecCommand} ${format} ${quote(file)}`;
-    // return `${this.config.rspecCommand} -f d -f j --out results.json ${quote(file)}`;
+    const jsonOutput = `-f j --out ${quote(this.outputFilePath)}`;
+    const rspecCommand = `${this.config.rspecCommand} ${format} ${jsonOutput} ${quote(file)}`;
 
     return cmdJoin(cdCommand, rspecCommand);
   }
