@@ -7,10 +7,11 @@ export class SpecResultPresenter {
 
   private passedGutter: vscode.TextEditorDecorationType;
   private stalePassedGutter: vscode.TextEditorDecorationType;
-  private failedGutter: vscode.TextEditorDecorationType;
   private pendingGutter: vscode.TextEditorDecorationType;
   private stalePendingGutter: vscode.TextEditorDecorationType;
   private testRunPendingGutter: vscode.TextEditorDecorationType;
+  private failedGutter: vscode.TextEditorDecorationType;
+  private staleFailedGutter: vscode.TextEditorDecorationType;
   private failedLine: vscode.TextEditorDecorationType;
   private staleFailedLine: vscode.TextEditorDecorationType;
 
@@ -21,6 +22,7 @@ export class SpecResultPresenter {
     this.stalePendingGutter = vscode.window.createTextEditorDecorationType({ gutterIconPath: path.join(__dirname, '..', 'resources', 'pending_stale.svg'), overviewRulerColor: '#e0be69ba', overviewRulerLane: vscode.OverviewRulerLane.Left });
     this.testRunPendingGutter = vscode.window.createTextEditorDecorationType({ gutterIconPath: path.join(__dirname, '..', 'resources', 'test_run_pending.svg') });
     this.failedGutter = vscode.window.createTextEditorDecorationType({ gutterIconPath: path.join(__dirname, '..', 'resources', 'failed.svg'), overviewRulerColor: '#e15656ba', overviewRulerLane: vscode.OverviewRulerLane.Left });
+    this.staleFailedGutter = vscode.window.createTextEditorDecorationType({ gutterIconPath: path.join(__dirname, '..', 'resources', 'failed_stale.svg'), overviewRulerColor: '#e15656ba', overviewRulerLane: vscode.OverviewRulerLane.Left });
     this.failedLine = vscode.window.createTextEditorDecorationType({ backgroundColor: '#dc113766', overviewRulerColor: '#e15656ba', overviewRulerLane: vscode.OverviewRulerLane.Full });
     this.staleFailedLine = vscode.window.createTextEditorDecorationType({ backgroundColor: '#dc113733', overviewRulerColor: '#dc113766', overviewRulerLane: vscode.OverviewRulerLane.Full });
 
@@ -113,6 +115,16 @@ export class SpecResultPresenter {
       exception => `Failed: ${exception?.message}`,
       {
         state: RspecExampleStatus.Failed,
+        forCurrentTestRun: true,
+        forPendingTestRun: false
+      }
+    ));
+    activeEditor.setDecorations(this.staleFailedGutter, this.getDecorations(
+      activeEditor,
+      exception => `Failed (stale): ${exception?.message}`,
+      {
+        state: RspecExampleStatus.Failed,
+        forCurrentTestRun: false,
         forPendingTestRun: false
       }
     ));
