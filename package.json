@@ -18,6 +18,10 @@
 			{
 				"command": "extension.runSpec",
 				"title": "Ruby Spec Runner: Run this spec"
+			},
+			{
+				"command": "extension.runFailedExamples",
+				"title": "Ruby Spec Runner: Re-run failed examples"
 			}
 		],
 		"keybindings": [
@@ -33,7 +37,7 @@
 				"spec-runner.rspecCommand": {
 					"type": "string",
 					"default": "",
-					"description": "Provide an alternative rspec command (eg different path to rspec or run with env vars)",
+					"markdownDescription": "Provide an alternative rspec command. For example you may need to use a different path to rspec.\n\nCan also be used to disable code coverage by passing env vars. Example: `SKIP_COVERAGE=true bundle exec rspec`.",
 					"scope": "window"
 				},
 				"spec-runner.changeDirectoryToWorkspaceRoot": {
@@ -45,7 +49,7 @@
 				"spec-runner.projectPath": {
 					"type": "string",
 					"default": "",
-					"description": "Absolute path to project directory (e.g. /home/me/project/sub-folder)",
+					"description": "Absolute path to project directory (e.g. /home/me/project/sub-folder). Defaults to the workspace directory.",
 					"scope": "window"
 				},
 				"spec-runner.rspecFormat": {
@@ -62,6 +66,30 @@
 					"type": "boolean",
 					"default": true,
 					"description": "Save the file before running the spec",
+					"scope": "window"
+				},
+				"spec-runner.runAllButton": {
+					"type": "boolean",
+					"default": true,
+					"description": "Show a status bar button to run the current spec file",
+					"scope": "window"
+				},
+				"spec-runner.runAllFailedButton": {
+					"type": "boolean",
+					"default": false,
+					"description": "Show a status bar button to re-run the failed examples for the current spec file",
+					"scope": "window"
+				},
+				"spec-runner.codeLensPrompts": {
+					"type": "boolean",
+					"default": true,
+					"description": "Show code lens prompts to run specific examples or contexts in the editor",
+					"scope": "window"
+				},
+				"spec-runner.decorateEditorWithSpecResults": {
+					"type": "boolean",
+					"default": true,
+					"description": "Highlight errors, show spec results in the gutter, and highlighting in the overview ruler.",
 					"scope": "window"
 				}
 			}

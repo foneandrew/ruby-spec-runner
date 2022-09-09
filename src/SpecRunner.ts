@@ -22,15 +22,23 @@ export class SpecRunner {
     }
 
     if (arg?.fileName) {
-      this.runSpecForFile(arg.fileName, arg.line, arg.name);
+      this.runSpecForFile(arg.fileName, false, arg.line, arg.name);
     } else {
       this.runCurrentSpec();
     }
   }
 
-  async runSpecForFile(fileName: string, line?: number, testName?: string) {
+  async runFailedExample() {
+    if (this.config.saveBeforeRunning) {
+      await vscode.commands.executeCommand('workbench.action.files.save');
+    }
+
+    this.runCurrentSpec(true);
+  }
+
+  async runSpecForFile(fileName: string, failedOnly:boolean, line?: number, testName?: string) {
     try {
-      const command = this.buildRspecCommand(fileName, line, testName);
+      const command = this.buildRspecCommand(fileName, failedOnly, line, testName);
       this.runTerminalCommand(command);
       this.presenter.setPending(fileName);
     } catch (error: any) {
@@ -43,7 +51,7 @@ export class SpecRunner {
     }
   }
 
-  async runCurrentSpec() {
+  async runCurrentSpec(failedOnly=false) {
     const filePath = vscode.window.activeTextEditor?.document.fileName;
     if (!filePath) {
       console.error('SpecRunner: Unable to run spec as no editor is open.');
@@ -51,16 +59,17 @@ export class SpecRunner {
       return;
     }
 
-    await this.runSpecForFile(filePath);
+    await this.runSpecForFile(filePath, failedOnly);
   }
 
-  private buildRspecCommand(fileName: string, line?: number, testName?: string) {
-    const cdCommand = this.buildChangeDirectoryToWorkspaceRootCommand();
+  private buildRspecCommand(fileName: string, failedOnly: boolean, line?: number, testName?: string) {
     const file = line ? [fileName, ':', line].join('') : fileName;
+    const failedOnlyModifier = failedOnly ? '--only-failures' : '';
     const format = `-f ${this.config.rspecFormat}`;
-    const jsonOutput = `-f j --out ${quote(this.outputFilePath)}`;
-    const rspecCommand = `${this.config.rspecCommand} ${format} ${jsonOutput} ${quote(file)}`;
+    const jsonOutput = this.config.decorateEditorWithSpecResults ? `-f j --out ${quote(this.outputFilePath)}` : '';
 
+    const cdCommand = this.buildChangeDirectoryToWorkspaceRootCommand();
+    const rspecCommand = [this.config.rspecCommand, failedOnlyModifier, format, jsonOutput, quote(file)].join(' ');
     return cmdJoin(cdCommand, rspecCommand);
   }
 

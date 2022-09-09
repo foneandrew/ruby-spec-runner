@@ -7,7 +7,6 @@ import { isRspecOutput } from './util';
 import { RspecException, RspecOutput, TestResultException, TestResults } from './types';
 import { SpecRunnerConfig } from './SpecRunnerConfig';
 import SpecResultPresenter from './SpecResultPresenter';
-import { throws } from 'assert';
 
 export class SpecResultInterpreter {
   private config: SpecRunnerConfig;
@@ -60,11 +59,11 @@ export class SpecResultInterpreter {
     });
   }
 
-  updateFromOutputJson(json: string) {
+  async updateFromOutputJson(json: string) {
     try {
       const results = JSON.parse(json);
       if (isRspecOutput(results)) {
-        this.updateFromRspecOutput(results);
+        await this.updateFromRspecOutput(results);
         return;
       }
 
@@ -74,20 +73,21 @@ export class SpecResultInterpreter {
     }
   }
 
-  updateFromRspecOutput(output: RspecOutput) {
+  async updateFromRspecOutput(output: RspecOutput) {
     const { examples } = output;
     const testRun = Date.now().toString();
     const testResults: TestResults = {};
 
     // eslint-disable-next-line @typescript-eslint/naming-convention
-    examples.forEach(({ file_path, line_number, id, status, exception }) => {
-      const fileResults = testResults[this.testFilePath(file_path)] ||= {
+    await Promise.all(examples.map(async ({ file_path, line_number, id, status, exception }) => {
+      const absoluteFilePath = await this.testFilePath(file_path);
+      const fileResults = testResults[absoluteFilePath] ||= {
         testRun,
         testRunPending: false,
         results: {}
       };
 
-      const file = vscode.workspace.textDocuments.find((doc) => doc.fileName === this.testFilePath(file_path));
+      const file = vscode.workspace.textDocuments.find((doc) => doc.fileName === absoluteFilePath);
 
       fileResults.results[line_number.toString()] = {
         id,
@@ -97,7 +97,7 @@ export class SpecResultInterpreter {
         status,
         exception: this.exceptionContent(exception, file)
       };
-    });
+    }));
 
     this.presenter.setTestResults(testResults);
   }
@@ -128,9 +128,23 @@ export class SpecResultInterpreter {
     return file?.getText(new vscode.Range(line - 1, 0, line - 1, 1000)) || Date.now().toString();
   }
 
-  private testFilePath(maybeARelativeFilePath: string) {
+  private async testFilePath(maybeARelativeFilePath: string) {
     if (maybeARelativeFilePath.startsWith('.')) {
-      return maybeARelativeFilePath.replace(/^\./, this.config.projectPath);
+      try {
+        // attempt to replace the relative path with an absolute path using the workspace root
+        return maybeARelativeFilePath.replace(/^\./, this.config.projectPath);
+      } catch (error: any) {
+        if (error?.name === 'NoWorkspaceError') {
+          // We are unable to figure out the workspace root so we will try and find the file
+          const files = await vscode.workspace.findFiles(maybeARelativeFilePath.replace(/^\.[\/\\]/, ''));
+
+          if (files.length) {
+            return files[0].fsPath;
+          }
+        }
+
+        throw error;
+      }
     }
 
     return maybeARelativeFilePath;

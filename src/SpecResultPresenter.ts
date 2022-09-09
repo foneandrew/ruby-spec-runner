@@ -1,9 +1,11 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import { RspecExampleStatus, TestResultException, TestResults } from './types';
+import SpecRunnerConfig from './SpecRunnerConfig';
 
 export class SpecResultPresenter {
   private _testResults!: TestResults;
+  private config: SpecRunnerConfig;
 
   private passedGutter: vscode.TextEditorDecorationType;
   private stalePassedGutter: vscode.TextEditorDecorationType;
@@ -15,7 +17,7 @@ export class SpecResultPresenter {
   private failedLine: vscode.TextEditorDecorationType;
   private staleFailedLine: vscode.TextEditorDecorationType;
 
-  constructor(context: vscode.ExtensionContext) {
+  constructor(context: vscode.ExtensionContext, config: SpecRunnerConfig) {
     this.passedGutter = vscode.window.createTextEditorDecorationType({ gutterIconPath: path.join(__dirname, '..', 'resources', 'passed.svg'), overviewRulerColor: '#69e06dba', overviewRulerLane: vscode.OverviewRulerLane.Left });
     this.stalePassedGutter = vscode.window.createTextEditorDecorationType({ gutterIconPath: path.join(__dirname, '..', 'resources', 'passed_stale.svg'), overviewRulerColor: '#69e06dba', overviewRulerLane: vscode.OverviewRulerLane.Left });
     this.pendingGutter = vscode.window.createTextEditorDecorationType({ gutterIconPath: path.join(__dirname, '..', 'resources', 'pending.svg'), overviewRulerColor: '#e0be69ba', overviewRulerLane: vscode.OverviewRulerLane.Left });
@@ -25,6 +27,8 @@ export class SpecResultPresenter {
     this.staleFailedGutter = vscode.window.createTextEditorDecorationType({ gutterIconPath: path.join(__dirname, '..', 'resources', 'failed_stale.svg'), overviewRulerColor: '#e15656ba', overviewRulerLane: vscode.OverviewRulerLane.Left });
     this.failedLine = vscode.window.createTextEditorDecorationType({ backgroundColor: '#dc113766', overviewRulerColor: '#e15656ba', overviewRulerLane: vscode.OverviewRulerLane.Full });
     this.staleFailedLine = vscode.window.createTextEditorDecorationType({ backgroundColor: '#dc113733', overviewRulerColor: '#dc113766', overviewRulerLane: vscode.OverviewRulerLane.Full });
+
+    this.config = config;
 
     context.subscriptions.push(this.passedGutter);
     context.subscriptions.push(this.stalePassedGutter);
@@ -61,6 +65,11 @@ export class SpecResultPresenter {
     }
 
     this.clearGutters(activeEditor);
+
+    if (!this.config.decorateEditorWithSpecResults) {
+      return;
+    }
+
     this.syncTestResults(activeEditor);
     this.syncTestResultExceptions(activeEditor);
 
@@ -219,7 +228,8 @@ export class SpecResultPresenter {
           filter = filter && (result.status === options.state);
         }
 
-        if (options.forCurrentTestRun != undefined){
+        // eslint-disable-next-line eqeqeq
+        if (options.forCurrentTestRun != undefined) {
           const isForDesiredTestRun = options.forCurrentTestRun ? (result.testRun === currentTestRun) : (result.testRun !== currentTestRun);
           filter = filter && isForDesiredTestRun;
         }

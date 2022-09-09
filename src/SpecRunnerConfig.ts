@@ -7,10 +7,7 @@ export class SpecRunnerConfig {
   }
 
   get changeDirectoryToWorkspaceRoot(): boolean {
-    const result = vscode.workspace.getConfiguration().get('spec-runner.changeDirectoryToWorkspaceRoot') as boolean | undefined;
-    // eslint-disable-next-line eqeqeq
-    if (result == null) { return false; }
-    return result;
+    return this.getBooleanConfig('spec-runner.changeDirectoryToWorkspaceRoot', false);
   }
 
   get projectPath(): string {
@@ -30,15 +27,41 @@ export class SpecRunnerConfig {
   }
 
   get saveBeforeRunning(): boolean {
-    const result = vscode.workspace.getConfiguration().get('spec-runner.saveBeforeRunning') as boolean | undefined;
+    return this.getBooleanConfig('spec-runner.saveBeforeRunning', false);
+  }
+
+  get runAllButton(): boolean {
+    return this.getBooleanConfig('spec-runner.runAllButton', true);
+  }
+
+  get runAllFailedButton(): boolean {
+    return this.getBooleanConfig('spec-runner.runAllFailedButton', false);
+  }
+
+  get codeLensRunner(): boolean {
+    return this.getBooleanConfig('spec-runner.codeLensRunner', true);
+  }
+
+  get decorateEditorWithSpecResults(): boolean {
+    return this.getBooleanConfig('spec-runner.decorateEditorWithSpecResults', true);
+  }
+
+  private getBooleanConfig(key: string, defaultValue: boolean) {
+    const result = vscode.workspace.getConfiguration().get('spec-runner.decorateEditorWithSpecResults') as boolean | undefined;
     // eslint-disable-next-line eqeqeq
-    if (result == null) { return false; }
+    if (result == null) { return defaultValue; }
     return result;
   }
 
   private get currentWorkspaceFolderPath(): string {
     const editor = vscode.window.activeTextEditor;
     if (!editor?.document.uri || !vscode.workspace.getWorkspaceFolder(editor.document.uri)) {
+      // Fallback to using the only workspace folder if there is no active editor
+      const workspaceFolders = vscode.workspace.workspaceFolders;
+      if (workspaceFolders && workspaceFolders.length === 0) {
+        return workspaceFolders[0].uri.fsPath;
+      }
+
       throw new NoWorkspaceError();
     }
 
