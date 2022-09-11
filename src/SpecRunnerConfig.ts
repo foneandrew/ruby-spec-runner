@@ -47,7 +47,7 @@ export class SpecRunnerConfig {
   }
 
   private getBooleanConfig(key: string, defaultValue: boolean) {
-    const result = vscode.workspace.getConfiguration().get('spec-runner.decorateEditorWithSpecResults') as boolean | undefined;
+    const result = vscode.workspace.getConfiguration().get(key) as boolean | undefined;
     // eslint-disable-next-line eqeqeq
     if (result == null) { return defaultValue; }
     return result;
