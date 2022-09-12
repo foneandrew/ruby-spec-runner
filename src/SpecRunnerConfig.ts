@@ -46,16 +46,16 @@ export class SpecRunnerConfig {
     return this.getBooleanConfig('spec-runner.saveBeforeRunning', false);
   }
 
-  get rspecRunAllButton(): boolean {
-    return this.getBooleanConfig('spec-runner.rspecRunAllButton', true);
+  get rspecRunButton(): boolean {
+    return this.getBooleanConfig('spec-runner.rspecRunButton', true);
   }
 
   get rspecRunAllFailedButton(): boolean {
     return this.getBooleanConfig('spec-runner.rspecRunAllFailedButton', false);
   }
 
-  get minitestRunAllButton(): boolean {
-    return this.getBooleanConfig('spec-runner.minitestRunAllButton', true);
+  get minitestRunButton(): boolean {
+    return this.getBooleanConfig('spec-runner.minitestRunButton', true);
   }
 
   get rspecCodeLensPrompts(): boolean {

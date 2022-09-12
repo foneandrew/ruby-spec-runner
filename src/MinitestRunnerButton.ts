@@ -11,7 +11,7 @@ export class MinitestRunnerButton {
   }
 
   update(editor = vscode.window.activeTextEditor) {
-    if (!editor || !this.config.minitestRunAllButton) {
+    if (!editor || !this.config.minitestRunButton) {
       this.button.hide();
       return;
     }

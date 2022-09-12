@@ -1,11 +1,23 @@
 {
 	"name": "spec-runner",
 	"displayName": "Ruby Spec Runner",
-	"description": "Run specific rspec tests from vscode",
-	"version": "0.0.1",
+	"description": "Run specific rspec & minitest tests from within vscode",
+	"publisher": "Fooo",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/foneandrew/ruby-spec-runner"
+	},
+	"icon": "images/icon.png",
+	"license": "MIT",
+	"version": "1.0.0",
 	"engines": {
 		"vscode": "^1.70.0"
 	},
+	"keywords": [
+    "ruby tests",
+    "rspec",
+    "minitest"
+  ],
 	"categories": [
 		"Other"
 	],
@@ -82,25 +94,25 @@
 					"description": "Save the file before running the spec/test",
 					"scope": "window"
 				},
-				"spec-runner.runAllButton": {
+				"spec-runner.rspecRunButton": {
 					"type": "boolean",
 					"default": true,
 					"description": "Rspec: Show a status bar button to run the current spec file",
 					"scope": "window"
 				},
-				"spec-runner.runAllFailedButton": {
+				"spec-runner.rspecRunAllFailedButton": {
 					"type": "boolean",
 					"default": false,
 					"description": "Rspec: Show a status bar button to re-run the failed examples for the current spec file",
 					"scope": "window"
 				},
-				"spec-runner.runAllMinitestButton": {
+				"spec-runner.minitestRunButton": {
 					"type": "boolean",
 					"default": true,
 					"description": "Minitest: Show a status bar button to run the current minitest file",
 					"scope": "window"
 				},
-				"spec-runner.codeLensPrompts": {
+				"spec-runner.rspecCodeLensPrompts": {
 					"type": "boolean",
 					"default": true,
 					"description": "Rspec: Show code lens prompts to run specific examples or contexts in the editor",
@@ -112,10 +124,26 @@
 					"description": "Minitest: Show code lens prompts to run specific examples or contexts in the editor",
 					"scope": "window"
 				},
-				"spec-runner.decorateEditorWithSpecResults": {
+				"spec-runner.rspecDecorateEditorWithResults": {
 					"type": "boolean",
 					"default": true,
 					"description": "Rspec: Highlight errors, show spec results in the gutter, and highlighting in the overview ruler.",
+					"scope": "window"
+				},
+				"spec-runner.minitestDecorateEditorWithResults": {
+					"type": "boolean",
+					"default": true,
+					"markdownDescription": "Minitest: Highlight errors, show spec results in the gutter, and highlighting in the overview ruler.\n\n**Windows users: turn this off if the minitest command is failing or check the spec runner windowsTerminalType configuration.**",
+					"scope": "window"
+				},
+				"spec-runner.windowsTerminalType": {
+					"type": "string",
+					"enum": [
+						"Bash",
+						"Powershell"
+					],
+					"default": "Powershell",
+					"markdownDescription": "Select the vscode default terminal for windows machines. Affects the command used for minitest editor decoration.",
 					"scope": "window"
 				}
 			}
