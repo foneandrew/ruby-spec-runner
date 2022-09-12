@@ -6,6 +6,9 @@ import { SpecRunnerButton } from './SpecRunnerButton';
 import { FailedSpecRunnerButton } from './FailedSpecRunnerButton';
 import SpecResultInterpreter from './SpecResultInterpreter';
 import SpecResultPresenter from './SpecResultPresenter';
+import MinitestRunner from './MinitestRunner';
+import MinitestRunnerCodeLensProvider from './MinitestRunnerCodeLensProvider';
+import MinitestRunnerButton from './MinitestRunnerButton';
 
 // This method is called when the extension is activated
 export function activate(context: vscode.ExtensionContext) {
@@ -15,6 +18,7 @@ export function activate(context: vscode.ExtensionContext) {
 	const resultPresenter = new SpecResultPresenter(context, config);
 	const resultInterpreter = new SpecResultInterpreter(config, context, resultPresenter);
 	const specRunner = new SpecRunner(config, resultInterpreter.outputFilePath, resultPresenter);
+	const minitestRunner = new MinitestRunner(config, resultPresenter);
 
 	const runSpec = vscode.commands.registerCommand(
     'extension.runSpec',
@@ -24,30 +28,45 @@ export function activate(context: vscode.ExtensionContext) {
     'extension.runFailedExamples',
     async () => specRunner.runFailedExample()
   );
+	const runMinitest = vscode.commands.registerCommand(
+    'extension.runMinitest',
+    async (...args) => minitestRunner.runTest(...args)
+  );
 
-	const codeLensProvider = new SpecRunnerCodeLensProvider(config);
+	const specCodeLensProvider = new SpecRunnerCodeLensProvider(config);
+	const minitestCodeLensProvider = new MinitestRunnerCodeLensProvider(config);
 
-	const docSelectors: vscode.DocumentFilter[] = [
+	const specDocSelectors: vscode.DocumentFilter[] = [
 		{ language: 'ruby', pattern: '**/*_spec.rb' },
 	];
-	const codeLensProviderDisposable = vscode.languages.registerCodeLensProvider(docSelectors, codeLensProvider);
+	const specCodeLensProviderDisposable = vscode.languages.registerCodeLensProvider(specDocSelectors, specCodeLensProvider);
+	const minitestDocSelectors: vscode.DocumentFilter[] = [
+		{ language: 'ruby', pattern: '**/*_test.rb' },
+	];
+	const minitestCodeLensProviderDisposable = vscode.languages.registerCodeLensProvider(minitestDocSelectors, minitestCodeLensProvider);
 
 	const failedSpecRunnerButton = new FailedSpecRunnerButton(vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 1), config);
 	const specRunnerButton = new SpecRunnerButton(vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 2), config);
+	const minitestRunnerButton = new MinitestRunnerButton(vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 2), config);
 
 	context.subscriptions.push(runSpec);
+	context.subscriptions.push(runMinitest);
 	context.subscriptions.push(runFailedExample);
-	context.subscriptions.push(codeLensProviderDisposable);
+	context.subscriptions.push(specCodeLensProviderDisposable);
+	context.subscriptions.push(minitestCodeLensProviderDisposable);
 	context.subscriptions.push(specRunnerButton.button);
 	context.subscriptions.push(failedSpecRunnerButton.button);
+	context.subscriptions.push(minitestRunnerButton.button);
 	context.subscriptions.push(vscode.window.onDidChangeActiveTextEditor((editor) => {
 		failedSpecRunnerButton.update(editor);
 		specRunnerButton.update(editor);
+		minitestRunnerButton.update(editor);
 		resultPresenter.update();
 	}));
 
 	failedSpecRunnerButton.update();
 	specRunnerButton.update();
+	minitestRunnerButton.update();
 }
 
 // This method is called when the extension is deactivated

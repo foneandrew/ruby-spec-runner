@@ -22,6 +22,10 @@
 			{
 				"command": "extension.runFailedExamples",
 				"title": "Ruby Spec Runner: Re-run failed examples"
+			},
+			{
+				"command": "extension.runMinitest",
+				"title": "Ruby Spec Runner: Run this test"
 			}
 		],
 		"keybindings": [
@@ -37,7 +41,13 @@
 				"spec-runner.rspecCommand": {
 					"type": "string",
 					"default": "",
-					"markdownDescription": "Provide an alternative rspec command. For example you may need to use a different path to rspec.\n\nCan also be used to disable code coverage by passing env vars. Example: `SKIP_COVERAGE=true bundle exec rspec`.",
+					"markdownDescription": "Rspec: Provide an alternative rspec command. For example you may need to use a different path to rspec.\n\nCan also be used to disable code coverage by passing env vars. Example: `SKIP_COVERAGE=true bundle exec rspec`.",
+					"scope": "window"
+				},
+				"spec-runner.minitestCommand": {
+					"type": "string",
+					"default": "",
+					"markdownDescription": "Minitest: Provide an alternative minitest command. For example you may need to use a different path to minitest.\n\nCan also be used to disable code coverage by passing env vars. Example: `SKIP_COVERAGE=true bundle exec rails t`.",
 					"scope": "window"
 				},
 				"spec-runner.changeDirectoryToWorkspaceRoot": {
@@ -59,37 +69,49 @@
 						"Progress"
 					],
 					"default": "Progress",
-					"markdownDescription": "Output format for rspec.\n\n- **Documentation:** group and example names\n- **Progress:** dots for each example",
+					"markdownDescription": "Rspec: Output format for rspec.\n\n- **Documentation:** group and example names\n- **Progress:** dots for each example",
 					"scope": "window"
 				},
 				"spec-runner.saveBeforeRunning": {
 					"type": "boolean",
 					"default": true,
-					"description": "Save the file before running the spec",
+					"description": "Save the file before running the spec/test",
 					"scope": "window"
 				},
 				"spec-runner.runAllButton": {
 					"type": "boolean",
 					"default": true,
-					"description": "Show a status bar button to run the current spec file",
+					"description": "Rspec: Show a status bar button to run the current spec file",
 					"scope": "window"
 				},
 				"spec-runner.runAllFailedButton": {
 					"type": "boolean",
 					"default": false,
-					"description": "Show a status bar button to re-run the failed examples for the current spec file",
+					"description": "Rspec: Show a status bar button to re-run the failed examples for the current spec file",
+					"scope": "window"
+				},
+				"spec-runner.runAllMinitestButton": {
+					"type": "boolean",
+					"default": true,
+					"description": "Minitest: Show a status bar button to run the current minitest file",
 					"scope": "window"
 				},
 				"spec-runner.codeLensPrompts": {
 					"type": "boolean",
 					"default": true,
-					"description": "Show code lens prompts to run specific examples or contexts in the editor",
+					"description": "Rspec: Show code lens prompts to run specific examples or contexts in the editor",
+					"scope": "window"
+				},
+				"spec-runner.minitestCodeLensPrompts": {
+					"type": "boolean",
+					"default": true,
+					"description": "Minitest: Show code lens prompts to run specific examples or contexts in the editor",
 					"scope": "window"
 				},
 				"spec-runner.decorateEditorWithSpecResults": {
 					"type": "boolean",
 					"default": true,
-					"description": "Highlight errors, show spec results in the gutter, and highlighting in the overview ruler.",
+					"description": "Rspec: Highlight errors, show spec results in the gutter, and highlighting in the overview ruler.",
 					"scope": "window"
 				}
 			}

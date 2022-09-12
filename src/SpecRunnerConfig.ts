@@ -6,6 +6,11 @@ export class SpecRunnerConfig {
     return command?.trim() || 'bundle exec rspec';
   }
 
+  get minitestCommand(): string | undefined {
+    const command = vscode.workspace.getConfiguration().get('spec-runner.minitestCommand') as string | undefined;
+    return command?.trim() || 'bundle exec rails t';
+  }
+
   get changeDirectoryToWorkspaceRoot(): boolean {
     return this.getBooleanConfig('spec-runner.changeDirectoryToWorkspaceRoot', false);
   }
@@ -38,8 +43,16 @@ export class SpecRunnerConfig {
     return this.getBooleanConfig('spec-runner.runAllFailedButton', false);
   }
 
-  get codeLensRunner(): boolean {
-    return this.getBooleanConfig('spec-runner.codeLensRunner', true);
+  get runAllMinitestButton(): boolean {
+    return this.getBooleanConfig('spec-runner.runAllMinitestButton', true);
+  }
+
+  get codeLensPrompts(): boolean {
+    return this.getBooleanConfig('spec-runner.codeLensPrompts', true);
+  }
+
+  get minitestCodeLensPrompts(): boolean {
+    return this.getBooleanConfig('spec-runner.minitestCodeLensPrompts', true);
   }
 
   get decorateEditorWithSpecResults(): boolean {

@@ -1,5 +1,5 @@
 import { CodeLens, CodeLensProvider, Event, Position, ProviderResult, Range, TextDocument } from 'vscode';
-import { SpecParser } from './SpecParser';
+import MinitestParser from './MinitestParser';
 import SpecRunnerConfig from './SpecRunnerConfig';
 
 export type CodeLensCommandArg = {
@@ -8,7 +8,7 @@ export type CodeLensCommandArg = {
   name?: string;
 };
 
-export class SpecRunnerCodeLensProvider implements CodeLensProvider {
+export class MinitestRunnerCodeLensProvider implements CodeLensProvider {
   onDidChangeCodeLenses?: Event<void> | undefined;
   private config: SpecRunnerConfig;
 
@@ -17,27 +17,27 @@ export class SpecRunnerCodeLensProvider implements CodeLensProvider {
   }
 
   provideCodeLenses(document: TextDocument): ProviderResult<CodeLens[]> {
-    if (!this.config.codeLensPrompts) {
+    if (!this.config.minitestCodeLensPrompts) {
       return [];
     }
 
-    const parser = new SpecParser(document);
-    const specRegions = parser.getSpecRegions();
+    const parser = new MinitestParser(document);
+    const specRegions = parser.getTestRegions();
 
     const codeLens: CodeLens[] = [];
 
-    specRegions.forEach(specRegion => {
+    specRegions.forEach(testRegion => {
       codeLens.push(new CodeLens(
-        specRegion.range,
+        testRegion.range,
         {
           title: '$(testing-run-icon) Run',
           arguments: [{
             fileName: document.fileName,
-            name: specRegion.name,
-            line: specRegion.range.start.line + 1
+            name: testRegion.name,
+            line: testRegion.range.start.line + 1
           }],
-          command: 'extension.runSpec',
-          tooltip: 'Run this example/context in rspec'
+          command: 'extension.runMinitest',
+          tooltip: 'Run this test in minitest'
         }
       ));
     });
@@ -46,4 +46,4 @@ export class SpecRunnerCodeLensProvider implements CodeLensProvider {
   }
 }
 
-export default SpecRunnerCodeLensProvider;
+export default MinitestRunnerCodeLensProvider;
