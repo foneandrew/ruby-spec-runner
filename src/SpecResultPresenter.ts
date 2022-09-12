@@ -217,10 +217,14 @@ export class SpecResultPresenter {
 
         return filter;
       })
-      .map(result => ({
-        range: new vscode.Range(result.exception!.line! - 1, 0, result.exception!.line! - 1, result.exception!.content?.length || 1000),
-        hoverMessage: message(result.exception?.message)
-      }));
+      .map(result => {
+        const hoverMessage = message([result.exception?.type, result.exception?.message].filter(Boolean).join('\n'));
+
+        return {
+          range: new vscode.Range(result.exception!.line! - 1, 0, result.exception!.line! - 1, result.exception!.content?.length || 1000),
+          hoverMessage
+        };
+      });
   }
 
   private getDecorations(activeEditor: vscode.TextEditor, message: string | ((exception?: TestResultException) => string), options: {

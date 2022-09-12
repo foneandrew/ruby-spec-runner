@@ -42,7 +42,7 @@ export type RspecOutput = {
 };
 
 export interface TestResultException {
-  type: string;
+  type?: string;
   message: string;
   line?: number;
   content?: string;

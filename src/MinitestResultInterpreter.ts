@@ -3,17 +3,17 @@ import * as fs from 'fs';
 import * as tmp from 'tmp';
 import * as chokidar from 'chokidar';
 import * as path from 'path';
-import { isRspecOutput } from './util';
-import { RspecExampleStatus, RspecException, RspecOutput, TestResultException, TestResults } from './types';
+import { RspecExampleStatus, TestResultException, TestResults } from './types';
 import { SpecRunnerConfig } from './SpecRunnerConfig';
 import SpecResultPresenter from './SpecResultPresenter';
-import MinitestParser from './MinitestParser';
+import MinitestParser, { MinitestRegion } from './MinitestParser';
 
 export class SpecResultInterpreter {
   private colorCodesMatcher = /[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g;
   private summaryMatcher = /(?<tests>\d+) tests, (?<assertions>\d+) assertions, (?<failures>\d+) failures, (?<errors>\d+) errors, (?<skips>\d+) skips/;
   private skippedMatcher = /Skipped:\r?\n.+:(?<lineNumber>\d+)\]:\s*(?<message>.+)/g;
   private failureMatcher = /Failure:\r?\n.+:(?<lineNumber>\d+)\]\s*(?<message>(?:.|\r?\n[^\r\n])+)(?:\r?\n\r?\n|$)/g;
+  private errorMatcher = /Error:\r?\n(?<testName>.+)\s* :\r?\n(?<errorName>.+)\r?\n(?<stackTrace>(?:.|\r?\n[^\r\n])+)(?:\r?\n\r?\n|$)/g;
 
   private config: SpecRunnerConfig;
   private presenter: SpecResultPresenter;
@@ -72,17 +72,13 @@ export class SpecResultInterpreter {
       return;
     }
 
-    const strippedOutput = minitestOutput.replace(this.colorCodesMatcher, '');
-    const summaryMatch = strippedOutput.match(this.summaryMatcher);
-    const skippedMatches = [...strippedOutput.matchAll(this.skippedMatcher)];
-    const failedMatches = [...strippedOutput.matchAll(this.failureMatcher)];
-
     const file = vscode.workspace.textDocuments.find((doc) => doc.fileName === fileName);
     if (!file) {
       console.error('SpecRunner: Could not find file in workspace', fileName);
       return;
     }
 
+    const strippedOutput = minitestOutput.replace(this.colorCodesMatcher, '');
     const regions = new MinitestParser(file).getTestRegions();
     const reversedTestLines = regions.map(r => r.range.start.line + 1).reverse();
 
@@ -95,7 +91,46 @@ export class SpecResultInterpreter {
       results: {}
     };
 
+    let seenLines: number[] = [];
+    seenLines = seenLines.concat(this.failureMatches(strippedOutput, regions, file, testRun, fileResults));
+    seenLines = seenLines.concat(this.errorMatches(strippedOutput, regions, file, testRun, fileResults));
+    seenLines = seenLines.concat(this.skippedMatches(strippedOutput, regions, file, testRun, fileResults));
+
+    if (line === 'ALL') {
+      reversedTestLines.filter(line => !seenLines.includes(line)).forEach(line => {
+        fileResults.results[line.toString()] = {
+          id: '¯\\_(ツ)_/¯',
+          testRun,
+          content: this.contentAtLine(file, line),
+          status: RspecExampleStatus.Passed,
+          line: line
+        };
+      });
+    } else if (line.match(/^\d+$/) && Object.values(fileResults.results).length === 0) {
+      // Ran a single test and it didn't fail, error or skip so therefore it must have passed
+      const lineNumber = parseInt(line);
+      fileResults.results[line] = {
+        id: '¯\\_(ツ)_/¯',
+        testRun,
+        content: this.contentAtLine(file, lineNumber),
+        status: RspecExampleStatus.Passed,
+        line: lineNumber
+      };
+    }
+
+    this.presenter.setTestResults(testResults);
+  }
+
+  private failureMatches(
+    output: string,
+    regions: MinitestRegion[],
+    file: vscode.TextDocument,
+    testRun: string,
+    fileResults: TestResults['results']
+  ) {
+    const reversedTestLines = regions.map(r => r.range.start.line + 1).reverse();
     const seenLines: number[] = [];
+    const failedMatches = [...output.matchAll(this.failureMatcher)];
 
     for (const failureMatch of failedMatches) {
       const failureLineNumber = parseInt(failureMatch.groups!.lineNumber);
@@ -114,7 +149,7 @@ export class SpecResultInterpreter {
       };
 
       fileResults.results[testLine.toString()] = {
-        id: '¯\\_(ツ)_/¯', // Test id
+        id: '¯\\_(ツ)_/¯',
         testRun,
         content: this.contentAtLine(file, testLine),
         status: RspecExampleStatus.Failed,
@@ -124,6 +159,70 @@ export class SpecResultInterpreter {
 
       seenLines.push(testLine);
     }
+
+    return seenLines;
+  }
+
+  private errorMatches(
+    output: string,
+    regions: MinitestRegion[],
+    file: vscode.TextDocument,
+    testRun: string,
+    fileResults: TestResults['results']
+  ) {
+    const reversedTestLines = regions.map(r => r.range.start.line + 1).reverse();
+    const seenLines: number[] = [];
+    const errorMatches = [...output.matchAll(this.errorMatcher)];
+    const relativePath = file.fileName.replace(this.config.projectPath, '').substring(1);
+
+    for (const errorMatch of errorMatches) {
+      const exceptionLine = errorMatch.groups!.stackTrace
+        .split(/\r?\n/)
+        .map(l => l.trim())
+        .find(traceLine => new RegExp(`^.*${relativePath}:\\d+:in`).test(traceLine));
+
+      if (!exceptionLine) {
+        console.error('SpecRunner: Could not find exception line in stack trace', errorMatch.groups!.stackTrace);
+        continue;
+      }
+      const lineNumMatch = exceptionLine.match(/:(\d+):in/);
+      const exceptionLineNum = parseInt(lineNumMatch![1]);
+      const testLine = reversedTestLines.find(r => r <= exceptionLineNum);
+
+      if (!testLine) {
+        console.error('SpecRunner: Could not find region for line', exceptionLineNum);
+        continue;
+      }
+
+      fileResults.results[testLine.toString()] = {
+        id: '¯\\_(ツ)_/¯',
+        testRun,
+        content: this.contentAtLine(file, testLine),
+        status: RspecExampleStatus.Failed,
+        line: testLine,
+        exception: {
+          message: errorMatch.groups!.errorName,
+          line: exceptionLineNum,
+          content: this.contentAtLine(file, exceptionLineNum)
+        }
+      };
+
+      seenLines.push(testLine);
+    }
+
+    return seenLines;
+  }
+
+  private skippedMatches(
+    output: string,
+    regions: MinitestRegion[],
+    file: vscode.TextDocument,
+    testRun: string,
+    fileResults: TestResults['results']
+  ) {
+    const reversedTestLines = regions.map(r => r.range.start.line + 1).reverse();
+    const seenLines: number[] = [];
+    const skippedMatches = [...output.matchAll(this.skippedMatcher)];
 
     for (const skippedMatch of skippedMatches) {
       const failureLineNumber = parseInt(skippedMatch.groups!.lineNumber);
@@ -135,7 +234,7 @@ export class SpecResultInterpreter {
       }
 
       fileResults.results[testLine.toString()] = {
-        id: '¯\\_(ツ)_/¯', // Test id
+        id: '¯\\_(ツ)_/¯',
         testRun,
         content: this.contentAtLine(file, testLine),
         status: RspecExampleStatus.Pending,
@@ -145,29 +244,7 @@ export class SpecResultInterpreter {
       seenLines.push(testLine);
     }
 
-    if (line === 'ALL') {
-      reversedTestLines.filter(line => !seenLines.includes(line)).forEach(line => {
-        fileResults.results[line.toString()] = {
-          id: '¯\\_(ツ)_/¯', // Test id
-          testRun,
-          content: this.contentAtLine(file, line),
-          status: RspecExampleStatus.Passed,
-          line: line
-        };
-      });
-    } else if (line.match(/^\d+$/) && Object.values(fileResults.results).length === 0) {
-      // Ran a single test and it didn't fail or skip
-      const lineNumber = parseInt(line);
-      fileResults.results[line] = {
-        id: '¯\\_(ツ)_/¯', // Test id
-        testRun,
-        content: this.contentAtLine(file, lineNumber),
-        status: RspecExampleStatus.Passed,
-        line: lineNumber
-      };
-    }
-
-    this.presenter.setTestResults(testResults);
+    return seenLines;
   }
 
   private contentAtLine(file: vscode.TextDocument | undefined, line: number) {
