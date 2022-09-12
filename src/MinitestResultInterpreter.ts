@@ -91,12 +91,26 @@ export class SpecResultInterpreter {
       results: {}
     };
 
+    let testFinished = false;
+    const summaryMatch = strippedOutput.match(this.summaryMatcher);
+    if (summaryMatch?.groups?.tests) {
+      const testCount = parseInt(summaryMatch?.groups?.tests);
+      if (testCount > 0) {
+        testFinished = true;
+      }
+    }
+
+    if (!testFinished) {
+      return;
+    }
+
     let seenLines: number[] = [];
     seenLines = seenLines.concat(this.failureMatches(strippedOutput, regions, file, testRun, fileResults));
     seenLines = seenLines.concat(this.errorMatches(strippedOutput, regions, file, testRun, fileResults));
     seenLines = seenLines.concat(this.skippedMatches(strippedOutput, regions, file, testRun, fileResults));
 
     if (line === 'ALL') {
+      // Find the tests that didn't fail, error or skip (they must have passed)
       reversedTestLines.filter(line => !seenLines.includes(line)).forEach(line => {
         fileResults.results[line.toString()] = {
           id: '¯\\_(ツ)_/¯',
@@ -107,8 +121,9 @@ export class SpecResultInterpreter {
         };
       });
     } else if (line.match(/^\d+$/) && Object.values(fileResults.results).length === 0) {
-      // Ran a single test and it didn't fail, error or skip so therefore it must have passed
       const lineNumber = parseInt(line);
+
+      // Ran a single test and it didn't fail, error or skip so it must have passed
       fileResults.results[line] = {
         id: '¯\\_(ツ)_/¯',
         testRun,

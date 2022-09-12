@@ -2,7 +2,7 @@
 
 Run ruby rspec and minitests from vscode.
 
-This extension is very heavily inspired by the [vscode-jest-runner](https://marketplace.visualstudio.com/items?itemName=firsttris.vscode-jest-runner) and [ruby-test-runner](https://marketplace.visualstudio.com/items?itemName=MateuszDrewniak.ruby-test-runner) extensions. ruby-test-runner didn't quite meet my needs to I decide to try and build my own version. `¯\_(ツ)_/¯`
+This extension is very heavily inspired by the [vscode-jest-runner](https://marketplace.visualstudio.com/items?itemName=firsttris.vscode-jest-runner) and [ruby-test-runner](https://marketplace.visualstudio.com/items?itemName=MateuszDrewniak.ruby-test-runner) extensions. ruby-test-runner didn't quite meet my needs to I decided to try and build my own version. `¯\_(ツ)_/¯`
 
 ## Features
 
@@ -35,7 +35,8 @@ This extension contributes the following settings:
 
 ## Known Issues
 
-I don't have access to a windows machine so I can only hope that it works there.
+- I don't have access to a windows machine so I can only hope that it works there.
+- Minitest support can be a bit janky as the default output isn't ideal for parsing
 
 ## Release Notes
 

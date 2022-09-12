@@ -2,6 +2,10 @@
 
 All notable changes to the "spec-runner" extension will be documented in this file.
 
+## [1.1.1]
+
+- Better detection for when minitest fails to finish
+
 ## [1.1.0]
 
 - Support minitest error results
