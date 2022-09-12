@@ -66,7 +66,7 @@ export class SpecRunner {
     const file = line ? [fileName, ':', line].join('') : fileName;
     const failedOnlyModifier = failedOnly ? '--only-failures' : '';
     const format = `-f ${this.config.rspecFormat}`;
-    const jsonOutput = this.config.decorateEditorWithSpecResults ? `-f j --out ${quote(this.outputFilePath)}` : '';
+    const jsonOutput = this.config.rspecDecorateEditorWithResults ? `-f j --out ${quote(this.outputFilePath)}` : '';
 
     const cdCommand = this.buildChangeDirectoryToWorkspaceRootCommand();
     const rspecCommand = [this.config.rspecCommand, failedOnlyModifier, format, jsonOutput, quote(file)].join(' ');

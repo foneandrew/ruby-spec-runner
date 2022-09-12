@@ -1,16 +1,18 @@
 import * as vscode from 'vscode';
 import { CodeLensCommandArg } from './SpecRunnerCodeLensProvider';
 import SpecRunnerConfig from './SpecRunnerConfig';
-import { cmdJoin, quote } from './util';
+import { cmdJoin, quote, teeCommand } from './util';
 import SpecResultPresenter from './SpecResultPresenter';
 
 export class MinitestRunner {
   private _term!: vscode.Terminal;
   private config: SpecRunnerConfig;
+  private outputFilePath: string;
   private presenter: SpecResultPresenter;
 
-  constructor(config: SpecRunnerConfig, presenter: SpecResultPresenter) {
+  constructor(config: SpecRunnerConfig, outputFilePath: string, presenter: SpecResultPresenter) {
     this.config = config;
+    this.outputFilePath = outputFilePath;
     this.presenter = presenter;
   }
 
@@ -57,6 +59,13 @@ export class MinitestRunner {
 
     const cdCommand = this.buildChangeDirectoryToWorkspaceRootCommand();
     const minitestCommand = [this.config.minitestCommand, quote(file)].join(' ');
+
+    const saveRunOptions = cmdJoin(`echo ${fileName} > ${this.outputFilePath}`, `echo ${line || 'ALL'} >> ${this.outputFilePath}`);
+    const outputRedirect = `| ${teeCommand(this.outputFilePath, true, this.config.usingBashInWindows)}`;
+    if (this.config.minitestDecorateEditorWithResults) {
+      return cmdJoin(cdCommand, saveRunOptions, [minitestCommand, outputRedirect].join(' '));
+    }
+
     return cmdJoin(cdCommand, minitestCommand);
   }
 

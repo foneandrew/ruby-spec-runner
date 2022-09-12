@@ -31,32 +31,47 @@ export class SpecRunnerConfig {
     };
   }
 
+  get usingBashInWindows(): boolean {
+    const format = vscode.workspace.getConfiguration().get('spec-runner.windowsTerminalType') as string | undefined;
+
+    switch (format) {
+      case 'Bash':
+        return true;
+      default:
+        return false;
+    };
+  }
+
   get saveBeforeRunning(): boolean {
     return this.getBooleanConfig('spec-runner.saveBeforeRunning', false);
   }
 
-  get runAllButton(): boolean {
-    return this.getBooleanConfig('spec-runner.runAllButton', true);
+  get rspecRunAllButton(): boolean {
+    return this.getBooleanConfig('spec-runner.rspecRunAllButton', true);
   }
 
-  get runAllFailedButton(): boolean {
-    return this.getBooleanConfig('spec-runner.runAllFailedButton', false);
+  get rspecRunAllFailedButton(): boolean {
+    return this.getBooleanConfig('spec-runner.rspecRunAllFailedButton', false);
   }
 
-  get runAllMinitestButton(): boolean {
-    return this.getBooleanConfig('spec-runner.runAllMinitestButton', true);
+  get minitestRunAllButton(): boolean {
+    return this.getBooleanConfig('spec-runner.minitestRunAllButton', true);
   }
 
-  get codeLensPrompts(): boolean {
-    return this.getBooleanConfig('spec-runner.codeLensPrompts', true);
+  get rspecCodeLensPrompts(): boolean {
+    return this.getBooleanConfig('spec-runner.rspecCodeLensPrompts', true);
   }
 
   get minitestCodeLensPrompts(): boolean {
     return this.getBooleanConfig('spec-runner.minitestCodeLensPrompts', true);
   }
 
-  get decorateEditorWithSpecResults(): boolean {
-    return this.getBooleanConfig('spec-runner.decorateEditorWithSpecResults', true);
+  get rspecDecorateEditorWithResults(): boolean {
+    return this.getBooleanConfig('spec-runner.rspecDecorateEditorWithResults', true);
+  }
+
+  get minitestDecorateEditorWithResults(): boolean {
+    return this.getBooleanConfig('spec-runner.minitestDecorateEditorWithResults', true);
   }
 
   private getBooleanConfig(key: string, defaultValue: boolean) {

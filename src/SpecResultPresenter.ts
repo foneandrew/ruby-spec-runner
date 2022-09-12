@@ -66,7 +66,18 @@ export class SpecResultPresenter {
 
     this.clearGutters(activeEditor);
 
-    if (!this.config.decorateEditorWithSpecResults) {
+    const isSpecFile = activeEditor?.document.fileName.match(/_spec\.rb$/);
+    const isMinitestFile = activeEditor?.document.fileName.match(/_test\.rb$/);
+
+    if (!isSpecFile && !isMinitestFile) {
+      return;
+    }
+
+    if (isSpecFile && !this.config.rspecDecorateEditorWithResults) {
+      return;
+    }
+
+    if (isMinitestFile&& !this.config.minitestDecorateEditorWithResults) {
       return;
     }
 

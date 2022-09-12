@@ -1,6 +1,6 @@
 import { Position, Range, TextDocument } from "vscode";
 
-interface MinitestRegion {
+export interface MinitestRegion {
   range: Range;
   name?: string;
 };

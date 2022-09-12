@@ -11,7 +11,7 @@ export class SpecRunnerButton {
   }
 
   update(editor = vscode.window.activeTextEditor) {
-    if (!editor || !this.config.runAllButton) {
+    if (!editor || !this.config.rspecRunAllButton) {
       this.button.hide();
       return;
     }

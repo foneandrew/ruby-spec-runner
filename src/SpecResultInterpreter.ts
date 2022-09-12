@@ -43,11 +43,6 @@ export class SpecResultInterpreter {
     return this.outputFile.name;
   }
 
-
-  updateFromTestFileChange() {
-    throw new Error('Method not implemented.');
-  }
-
   updateFromOutputFile() {
     fs.readFile(this.outputFilePath, { encoding: 'utf-8' }, (err, data) => {
       if (err) {

@@ -11,7 +11,7 @@ export class FailedSpecRunnerButton {
   }
 
   update(editor = vscode.window.activeTextEditor) {
-    if (!editor || !this.config.runAllFailedButton) {
+    if (!editor || !this.config.rspecRunAllFailedButton) {
       this.button.hide();
       return;
     }

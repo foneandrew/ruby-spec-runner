@@ -9,16 +9,19 @@ import SpecResultPresenter from './SpecResultPresenter';
 import MinitestRunner from './MinitestRunner';
 import MinitestRunnerCodeLensProvider from './MinitestRunnerCodeLensProvider';
 import MinitestRunnerButton from './MinitestRunnerButton';
+import MinitestResultInterpreter from './MinitestResultInterpreter';
 
 // This method is called when the extension is activated
 export function activate(context: vscode.ExtensionContext) {
   console.log('Extension "spec-runner" is now active!');
 
   const config = new SpecRunnerConfig();
+
   const resultPresenter = new SpecResultPresenter(context, config);
   const resultInterpreter = new SpecResultInterpreter(config, context, resultPresenter);
+  const minitestInterpreter = new MinitestResultInterpreter(config, context, resultPresenter);
   const specRunner = new SpecRunner(config, resultInterpreter.outputFilePath, resultPresenter);
-  const minitestRunner = new MinitestRunner(config, resultPresenter);
+  const minitestRunner = new MinitestRunner(config, minitestInterpreter.outputFilePath, resultPresenter);
 
   const runRspecOrMinitestFile = vscode.commands.registerCommand(
     'extension.runRspecOrMinitestFile',

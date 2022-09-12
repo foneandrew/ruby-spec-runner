@@ -17,7 +17,7 @@ export class SpecRunnerCodeLensProvider implements CodeLensProvider {
   }
 
   provideCodeLenses(document: TextDocument): ProviderResult<CodeLens[]> {
-    if (!this.config.codeLensPrompts) {
+    if (!this.config.rspecCodeLensPrompts) {
       return [];
     }
 
