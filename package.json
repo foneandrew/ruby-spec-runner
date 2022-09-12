@@ -16,6 +16,10 @@
 	"contributes": {
 		"commands": [
 			{
+				"command": "extension.runRspecOrMinitestFile",
+				"title": "Ruby Spec Runner: Run this spec/minitest file"
+			},
+			{
 				"command": "extension.runSpec",
 				"title": "Ruby Spec Runner: Run this spec"
 			},
@@ -30,7 +34,7 @@
 		],
 		"keybindings": [
 			{
-				"command": "extension.runSpec",
+				"command": "extension.runRspecOrMinitestFile",
 				"key": "ctrl+alt+/",
 				"mac": "ctrl+cmd+/"
 			}
