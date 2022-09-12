@@ -2,26 +2,26 @@ import * as vscode from 'vscode';
 
 export class SpecRunnerConfig {
   get rspecCommand(): string | undefined {
-    const command = vscode.workspace.getConfiguration().get('spec-runner.rspecCommand') as string | undefined;
+    const command = vscode.workspace.getConfiguration().get('ruby-spec-runner.rspecCommand') as string | undefined;
     return command?.trim() || 'bundle exec rspec';
   }
 
   get minitestCommand(): string | undefined {
-    const command = vscode.workspace.getConfiguration().get('spec-runner.minitestCommand') as string | undefined;
+    const command = vscode.workspace.getConfiguration().get('ruby-spec-runner.minitestCommand') as string | undefined;
     return command?.trim() || 'bundle exec rails t';
   }
 
   get changeDirectoryToWorkspaceRoot(): boolean {
-    return this.getBooleanConfig('spec-runner.changeDirectoryToWorkspaceRoot', false);
+    return this.getBooleanConfig('ruby-spec-runner.changeDirectoryToWorkspaceRoot', false);
   }
 
   get projectPath(): string {
-    const path = vscode.workspace.getConfiguration().get('spec-runner.projectPath') as string | undefined;
+    const path = vscode.workspace.getConfiguration().get('ruby-spec-runner.projectPath') as string | undefined;
     return path || this.currentWorkspaceFolderPath;
   }
 
   get rspecFormat(): string {
-    const format = vscode.workspace.getConfiguration().get('spec-runner.rspecFormat') as string | undefined;
+    const format = vscode.workspace.getConfiguration().get('ruby-spec-runner.rspecFormat') as string | undefined;
 
     switch (format) {
       case 'Documentation':
@@ -32,7 +32,7 @@ export class SpecRunnerConfig {
   }
 
   get usingBashInWindows(): boolean {
-    const format = vscode.workspace.getConfiguration().get('spec-runner.windowsTerminalType') as string | undefined;
+    const format = vscode.workspace.getConfiguration().get('ruby-spec-runner.windowsTerminalType') as string | undefined;
 
     switch (format) {
       case 'Bash':
@@ -43,35 +43,35 @@ export class SpecRunnerConfig {
   }
 
   get saveBeforeRunning(): boolean {
-    return this.getBooleanConfig('spec-runner.saveBeforeRunning', false);
+    return this.getBooleanConfig('ruby-spec-runner.saveBeforeRunning', false);
   }
 
   get rspecRunButton(): boolean {
-    return this.getBooleanConfig('spec-runner.rspecRunButton', true);
+    return this.getBooleanConfig('ruby-spec-runner.rspecRunButton', true);
   }
 
   get rspecRunAllFailedButton(): boolean {
-    return this.getBooleanConfig('spec-runner.rspecRunAllFailedButton', false);
+    return this.getBooleanConfig('ruby-spec-runner.rspecRunAllFailedButton', false);
   }
 
   get minitestRunButton(): boolean {
-    return this.getBooleanConfig('spec-runner.minitestRunButton', true);
+    return this.getBooleanConfig('ruby-spec-runner.minitestRunButton', true);
   }
 
   get rspecCodeLensPrompts(): boolean {
-    return this.getBooleanConfig('spec-runner.rspecCodeLensPrompts', true);
+    return this.getBooleanConfig('ruby-spec-runner.rspecCodeLensPrompts', true);
   }
 
   get minitestCodeLensPrompts(): boolean {
-    return this.getBooleanConfig('spec-runner.minitestCodeLensPrompts', true);
+    return this.getBooleanConfig('ruby-spec-runner.minitestCodeLensPrompts', true);
   }
 
   get rspecDecorateEditorWithResults(): boolean {
-    return this.getBooleanConfig('spec-runner.rspecDecorateEditorWithResults', true);
+    return this.getBooleanConfig('ruby-spec-runner.rspecDecorateEditorWithResults', true);
   }
 
   get minitestDecorateEditorWithResults(): boolean {
-    return this.getBooleanConfig('spec-runner.minitestDecorateEditorWithResults', true);
+    return this.getBooleanConfig('ruby-spec-runner.minitestDecorateEditorWithResults', true);
   }
 
   private getBooleanConfig(key: string, defaultValue: boolean) {

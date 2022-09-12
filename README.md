@@ -1,4 +1,4 @@
-# Spec runner
+# Ruby spec runner
 
 Run ruby rspec and minitests from vscode.
 
@@ -18,20 +18,20 @@ This extension is very heavily inspired by the [vscode-jest-runner](https://mark
 
 This extension contributes the following settings:
 
-- `spec-runner.rspecCommand`: Override the rspec command
-- `spec-runner.minitestCommand`: Override the minitest command
-- `spec-runner.changeDirectoryToWorkspaceRoot`: When true the test command will cd to workspace root first
-- `spec-runner.projectPath`: Override the root project path
-- `spec-runner.rspecFormat`: Configure rspec's terminal output format
-- `spec-runner.saveBeforeRunning`: When true the test file is saved before it is run
-- `spec-runner.rspecRunButton`: Show a run button in the status bar
-- `spec-runner.rspecRunAllFailedButton`: Show a button to re-run failed tests in the status bar (disabled by default)
-- `spec-runner.minitestRunButton`: Show a run button in the status bar
-- `spec-runner.rspecCodeLensPrompts`: Show prompts in the editor to run an rspec test
-- `spec-runner.minitestCodeLensPrompts`: Show prompts in the editor to run a minitest test
-- `spec-runner.rspecDecorateEditorWithResults`: Show the results of rspec test runs in the editor
-- `spec-runner.minitestDecorateEditorWithResults`: Show the results of minitest runs in the editor
-- `spec-runner.windowsTerminalType`: For windows users that are using bash instead of powershell
+- `ruby-spec-runner.rspecCommand`: Override the rspec command
+- `ruby-spec-runner.minitestCommand`: Override the minitest command
+- `ruby-spec-runner.changeDirectoryToWorkspaceRoot`: When true the test command will cd to workspace root first
+- `ruby-spec-runner.projectPath`: Override the root project path
+- `ruby-spec-runner.rspecFormat`: Configure rspec's terminal output format
+- `ruby-spec-runner.saveBeforeRunning`: When true the test file is saved before it is run
+- `ruby-spec-runner.rspecRunButton`: Show a run button in the status bar
+- `ruby-spec-runner.rspecRunAllFailedButton`: Show a button to re-run failed tests in the status bar (disabled by default)
+- `ruby-spec-runner.minitestRunButton`: Show a run button in the status bar
+- `ruby-spec-runner.rspecCodeLensPrompts`: Show prompts in the editor to run an rspec test
+- `ruby-spec-runner.minitestCodeLensPrompts`: Show prompts in the editor to run a minitest test
+- `ruby-spec-runner.rspecDecorateEditorWithResults`: Show the results of rspec test runs in the editor
+- `ruby-spec-runner.minitestDecorateEditorWithResults`: Show the results of minitest runs in the editor
+- `ruby-spec-runner.windowsTerminalType`: For windows users that are using bash instead of powershell
 
 ## Known Issues
 

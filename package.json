@@ -1,5 +1,5 @@
 {
-	"name": "spec-runner",
+	"name": "ruby-spec-runner",
 	"displayName": "Ruby Spec Runner",
 	"description": "Run specific rspec & minitest tests from within vscode",
 	"publisher": "Fooo",
@@ -54,31 +54,31 @@
 		"configuration": {
 			"title": "Ruby Spec Runner",
 			"properties": {
-				"spec-runner.rspecCommand": {
+				"ruby-spec-runner.rspecCommand": {
 					"type": "string",
 					"default": "",
 					"markdownDescription": "Rspec: Provide an alternative rspec command. For example you may need to use a different path to rspec.\n\nCan also be used to disable code coverage by passing env vars. Example: `SKIP_COVERAGE=true bundle exec rspec`.",
 					"scope": "window"
 				},
-				"spec-runner.minitestCommand": {
+				"ruby-spec-runner.minitestCommand": {
 					"type": "string",
 					"default": "",
 					"markdownDescription": "Minitest: Provide an alternative minitest command. For example you may need to use a different path to minitest.\n\nCan also be used to disable code coverage by passing env vars. Example: `SKIP_COVERAGE=true bundle exec rails t`.",
 					"scope": "window"
 				},
-				"spec-runner.changeDirectoryToWorkspaceRoot": {
+				"ruby-spec-runner.changeDirectoryToWorkspaceRoot": {
 					"type": "boolean",
 					"default": true,
 					"description": "Changes directory to workspace root before running the spec",
 					"scope": "window"
 				},
-				"spec-runner.projectPath": {
+				"ruby-spec-runner.projectPath": {
 					"type": "string",
 					"default": "",
 					"description": "Absolute path to project directory (e.g. /home/me/project/sub-folder). Defaults to the workspace directory.",
 					"scope": "window"
 				},
-				"spec-runner.rspecFormat": {
+				"ruby-spec-runner.rspecFormat": {
 					"type": "string",
 					"enum": [
 						"Documentation",
@@ -88,55 +88,55 @@
 					"markdownDescription": "Rspec: Output format for rspec.\n\n- **Documentation:** group and example names\n- **Progress:** dots for each example",
 					"scope": "window"
 				},
-				"spec-runner.saveBeforeRunning": {
+				"ruby-spec-runner.saveBeforeRunning": {
 					"type": "boolean",
 					"default": true,
 					"description": "Save the file before running the spec/test",
 					"scope": "window"
 				},
-				"spec-runner.rspecRunButton": {
+				"ruby-spec-runner.rspecRunButton": {
 					"type": "boolean",
 					"default": true,
 					"description": "Rspec: Show a status bar button to run the current spec file",
 					"scope": "window"
 				},
-				"spec-runner.rspecRunAllFailedButton": {
+				"ruby-spec-runner.rspecRunAllFailedButton": {
 					"type": "boolean",
 					"default": false,
 					"description": "Rspec: Show a status bar button to re-run the failed examples for the current spec file",
 					"scope": "window"
 				},
-				"spec-runner.minitestRunButton": {
+				"ruby-spec-runner.minitestRunButton": {
 					"type": "boolean",
 					"default": true,
 					"description": "Minitest: Show a status bar button to run the current minitest file",
 					"scope": "window"
 				},
-				"spec-runner.rspecCodeLensPrompts": {
+				"ruby-spec-runner.rspecCodeLensPrompts": {
 					"type": "boolean",
 					"default": true,
 					"description": "Rspec: Show code lens prompts to run specific examples or contexts in the editor",
 					"scope": "window"
 				},
-				"spec-runner.minitestCodeLensPrompts": {
+				"ruby-spec-runner.minitestCodeLensPrompts": {
 					"type": "boolean",
 					"default": true,
 					"description": "Minitest: Show code lens prompts to run specific examples or contexts in the editor",
 					"scope": "window"
 				},
-				"spec-runner.rspecDecorateEditorWithResults": {
+				"ruby-spec-runner.rspecDecorateEditorWithResults": {
 					"type": "boolean",
 					"default": true,
 					"description": "Rspec: Highlight errors, show spec results in the gutter, and highlighting in the overview ruler.",
 					"scope": "window"
 				},
-				"spec-runner.minitestDecorateEditorWithResults": {
+				"ruby-spec-runner.minitestDecorateEditorWithResults": {
 					"type": "boolean",
 					"default": true,
 					"markdownDescription": "Minitest: Highlight errors, show spec results in the gutter, and highlighting in the overview ruler.\n\n**Windows users: turn this off if the minitest command is failing or check the spec runner windowsTerminalType configuration.**",
 					"scope": "window"
 				},
-				"spec-runner.windowsTerminalType": {
+				"ruby-spec-runner.windowsTerminalType": {
 					"type": "string",
 					"enum": [
 						"Bash",
