@@ -78,6 +78,11 @@ export class MinitestResultInterpreter {
       return;
     }
 
+    let testRunLineNumber: number | undefined;
+    if (line.match(/^\d+$/)) {
+      testRunLineNumber = parseInt(line);
+    }
+
     const strippedOutput = minitestOutput.replace(this.colorCodesMatcher, '');
     const regions = new MinitestParser(file).getTestRegions();
     const reversedTestLines = regions.map(r => r.range.start.line + 1).reverse();
@@ -105,9 +110,9 @@ export class MinitestResultInterpreter {
     }
 
     let seenLines: number[] = [];
-    seenLines = seenLines.concat(this.failureMatches(strippedOutput, regions, file, testRun, fileResults));
-    seenLines = seenLines.concat(this.errorMatches(strippedOutput, regions, file, testRun, fileResults));
-    seenLines = seenLines.concat(this.skippedMatches(strippedOutput, regions, file, testRun, fileResults));
+    seenLines = seenLines.concat(this.failureMatches(strippedOutput, regions, file, testRun, fileResults, testRunLineNumber));
+    seenLines = seenLines.concat(this.errorMatches(strippedOutput, regions, file, testRun, fileResults, testRunLineNumber));
+    seenLines = seenLines.concat(this.skippedMatches(strippedOutput, regions, file, testRun, fileResults, testRunLineNumber));
 
     if (line === 'ALL') {
       // Find the tests that didn't fail, error or skip (they must have passed)
@@ -120,16 +125,14 @@ export class MinitestResultInterpreter {
           line: line
         };
       });
-    } else if (line.match(/^\d+$/) && Object.values(fileResults.results).length === 0) {
-      const lineNumber = parseInt(line);
-
+    } else if (testRunLineNumber && Object.values(fileResults.results).length === 0) {
       // Ran a single test and it didn't fail, error or skip so it must have passed
       fileResults.results[line] = {
         id: '¯\\_(ツ)_/¯',
         testRun,
-        content: this.contentAtLine(file, lineNumber),
+        content: this.contentAtLine(file, testRunLineNumber),
         status: RspecExampleStatus.Passed,
-        line: lineNumber
+        line: testRunLineNumber
       };
     }
 
@@ -141,7 +144,8 @@ export class MinitestResultInterpreter {
     regions: MinitestRegion[],
     file: vscode.TextDocument,
     testRun: string,
-    fileResults: TestResults['results']
+    fileResults: TestResults['results'],
+    testRunLineNumber?: number
   ) {
     const reversedTestLines = regions.map(r => r.range.start.line + 1).reverse();
     const seenLines: number[] = [];
@@ -149,7 +153,8 @@ export class MinitestResultInterpreter {
 
     for (const failureMatch of failedMatches) {
       const failureLineNumber = parseInt(failureMatch.groups!.lineNumber);
-      const testLine = reversedTestLines.find(r => r <= failureLineNumber);
+      // If we are given a testRunLineNumber we will use it
+      const testLine = testRunLineNumber || reversedTestLines.find(r => r <= failureLineNumber);
 
       if (!testLine) {
         console.error('SpecRunner: Could not find region for line', failureLineNumber);
@@ -183,7 +188,8 @@ export class MinitestResultInterpreter {
     regions: MinitestRegion[],
     file: vscode.TextDocument,
     testRun: string,
-    fileResults: TestResults['results']
+    fileResults: TestResults['results'],
+    testRunLineNumber?: number
   ) {
     const reversedTestLines = regions.map(r => r.range.start.line + 1).reverse();
     const seenLines: number[] = [];
@@ -200,9 +206,11 @@ export class MinitestResultInterpreter {
         console.error('SpecRunner: Could not find exception line in stack trace', errorMatch.groups!.stackTrace);
         continue;
       }
+
       const lineNumMatch = exceptionLine.match(/:(\d+):in/);
       const exceptionLineNum = parseInt(lineNumMatch![1]);
-      const testLine = reversedTestLines.find(r => r <= exceptionLineNum);
+      // If we are given a testRunLineNumber we will use it
+      const testLine = testRunLineNumber || reversedTestLines.find(r => r <= exceptionLineNum);
 
       if (!testLine) {
         console.error('SpecRunner: Could not find region for line', exceptionLineNum);
@@ -233,7 +241,8 @@ export class MinitestResultInterpreter {
     regions: MinitestRegion[],
     file: vscode.TextDocument,
     testRun: string,
-    fileResults: TestResults['results']
+    fileResults: TestResults['results'],
+    testRunLineNumber?: number
   ) {
     const reversedTestLines = regions.map(r => r.range.start.line + 1).reverse();
     const seenLines: number[] = [];
@@ -241,7 +250,8 @@ export class MinitestResultInterpreter {
 
     for (const skippedMatch of skippedMatches) {
       const failureLineNumber = parseInt(skippedMatch.groups!.lineNumber);
-      const testLine = reversedTestLines.find(r => r <= failureLineNumber);
+      // If we are given a testRunLineNumber we will use it
+      const testLine = testRunLineNumber || reversedTestLines.find(r => r <= failureLineNumber);
 
       if (!testLine) {
         console.error('SpecRunner: Could not find region for line', failureLineNumber);
