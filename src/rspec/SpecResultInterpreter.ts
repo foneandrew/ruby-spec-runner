@@ -2,7 +2,6 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as tmp from 'tmp';
 import * as chokidar from 'chokidar';
-import * as path from 'path';
 import { isRspecOutput } from '../util';
 import { RspecException, RspecOutput, TestResultException, TestResults } from '../types';
 import { SpecRunnerConfig } from '../SpecRunnerConfig';
@@ -11,32 +10,12 @@ import SpecResultPresenter from '../SpecResultPresenter';
 export class SpecResultInterpreter {
   private config: SpecRunnerConfig;
   private presenter: SpecResultPresenter;
-  private passedGutter: vscode.TextEditorDecorationType;
-  private stalePassedGutter: vscode.TextEditorDecorationType;
-  private failedGutter: vscode.TextEditorDecorationType;
-  private pendingGutter: vscode.TextEditorDecorationType;
-  private stalePendingGutter: vscode.TextEditorDecorationType;
-  private failedLine: vscode.TextEditorDecorationType;
 
   private _tmpOutputFile!: tmp.FileResult;
 
   constructor(config: SpecRunnerConfig, context: vscode.ExtensionContext, presenter: SpecResultPresenter) {
     this.config = config;
     this.presenter = presenter;
-
-    this.passedGutter = vscode.window.createTextEditorDecorationType({ gutterIconPath: path.join(__dirname, '..', 'resources', 'passed.svg'), overviewRulerColor: '#69e06dba', overviewRulerLane: vscode.OverviewRulerLane.Center });
-    this.stalePassedGutter = vscode.window.createTextEditorDecorationType({ gutterIconPath: path.join(__dirname, '..', 'resources', 'passed_stale.svg'), overviewRulerColor: '#69e06dba', overviewRulerLane: vscode.OverviewRulerLane.Center });
-    this.pendingGutter = vscode.window.createTextEditorDecorationType({ gutterIconPath: path.join(__dirname, '..', 'resources', 'pending.svg'), overviewRulerColor: '#e0be69ba', overviewRulerLane: vscode.OverviewRulerLane.Center });
-    this.stalePendingGutter = vscode.window.createTextEditorDecorationType({ gutterIconPath: path.join(__dirname, '..', 'resources', 'pending_stale.svg'), overviewRulerColor: '#e0be69ba', overviewRulerLane: vscode.OverviewRulerLane.Center });
-    this.failedGutter = vscode.window.createTextEditorDecorationType({ gutterIconPath: path.join(__dirname, '..', 'resources', 'failed.svg'), overviewRulerColor: '#e06969ba', overviewRulerLane: vscode.OverviewRulerLane.Center });
-    this.failedLine = vscode.window.createTextEditorDecorationType({ backgroundColor: '#dc113766', overviewRulerColor: '#dc113766', overviewRulerLane: vscode.OverviewRulerLane.Right });
-
-    context.subscriptions.push(this.passedGutter);
-    context.subscriptions.push(this.stalePassedGutter);
-    context.subscriptions.push(this.pendingGutter);
-    context.subscriptions.push(this.stalePendingGutter);
-    context.subscriptions.push(this.failedGutter);
-    context.subscriptions.push(this.failedLine);
   }
 
   get outputFilePath() {

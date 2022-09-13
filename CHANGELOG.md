@@ -2,6 +2,10 @@
 
 All notable changes to the "spec-runner" extension will be documented in this file.
 
+## [1.1.4]
+
+- Minitest interpreter is slightly better at figuring out which test failed when the failure occurred in a setup block
+
 ## [1.1.3]
 
 - Minitest interpreter is slightly better at figuring out which test failed for single test runs

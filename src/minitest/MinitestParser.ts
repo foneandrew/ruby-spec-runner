@@ -23,7 +23,7 @@ export class MinitestParser {
       if (match) {
         regions.push({
           range: new Range(new Position(lineNo, 0), new Position(lineNo, lineContent.length)),
-          name: match.groups?.title || match.groups?.unitDef || match.groups?.describe
+          name: match.groups?.title || match.groups?.unitDef
         });
       }
     });
