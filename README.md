@@ -37,6 +37,7 @@ This extension contributes the following settings:
 
 - I don't have access to a windows machine so I can only hope that it works there.
 - Minitest support can be a bit janky as the default output isn't ideal for parsing
+- Editing a test file while tests are running may result in editor decorations appearing in the incorrect location
 
 ## Release Notes
 

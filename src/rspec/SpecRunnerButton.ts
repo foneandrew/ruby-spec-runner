@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
-import SpecRunnerConfig from './SpecRunnerConfig';
+import SpecRunnerConfig from '../SpecRunnerConfig';
 
-export class FailedSpecRunnerButton {
+export class SpecRunnerButton {
   button: vscode.StatusBarItem;
   private config: SpecRunnerConfig;
 
@@ -11,7 +11,7 @@ export class FailedSpecRunnerButton {
   }
 
   update(editor = vscode.window.activeTextEditor) {
-    if (!editor || !this.config.rspecRunAllFailedButton) {
+    if (!editor || !this.config.rspecRunButton) {
       this.button.hide();
       return;
     }
@@ -22,10 +22,10 @@ export class FailedSpecRunnerButton {
       return;
     }
 
-    this.button.text = '$(testing-run-icon) Run failed examples';
-    this.button.command = 'extension.runFailedExamples';
+    this.button.text = '$(testing-run-icon) Run spec';
+    this.button.command = 'extension.runSpec';
     this.button.show();
   }
 }
 
-export default FailedSpecRunnerButton;
+export default SpecRunnerButton;

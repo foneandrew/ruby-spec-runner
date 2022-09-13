@@ -1,4 +1,4 @@
-import { Position, Range, TextDocument } from "vscode";
+import { Position, Range, TextDocument } from 'vscode';
 
 interface SpecRegion {
   range: Range;

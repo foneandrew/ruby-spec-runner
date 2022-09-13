@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
-import SpecRunnerConfig from './SpecRunnerConfig';
+import SpecRunnerConfig from '../SpecRunnerConfig';
 
-export class MinitestRunnerButton {
+export class FailedSpecRunnerButton {
   button: vscode.StatusBarItem;
   private config: SpecRunnerConfig;
 
@@ -11,21 +11,21 @@ export class MinitestRunnerButton {
   }
 
   update(editor = vscode.window.activeTextEditor) {
-    if (!editor || !this.config.minitestRunButton) {
+    if (!editor || !this.config.rspecRunAllFailedButton) {
       this.button.hide();
       return;
     }
 
     const doc = editor.document;
-    if (doc.languageId !== 'ruby' || !doc.fileName.match(/_test\.rb$/)) {
+    if (doc.languageId !== 'ruby' || !doc.fileName.match(/_spec\.rb$/)) {
       this.button.hide();
       return;
     }
 
-    this.button.text = '$(testing-run-icon) Run test';
-    this.button.command = 'extension.runMinitest';
+    this.button.text = '$(testing-run-icon) Run failed examples';
+    this.button.command = 'extension.runFailedExamples';
     this.button.show();
   }
 }
 
-export default MinitestRunnerButton;
+export default FailedSpecRunnerButton;

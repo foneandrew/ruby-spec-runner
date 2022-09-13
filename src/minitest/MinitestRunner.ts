@@ -1,8 +1,8 @@
 import * as vscode from 'vscode';
-import { CodeLensCommandArg } from './SpecRunnerCodeLensProvider';
-import SpecRunnerConfig from './SpecRunnerConfig';
-import { cmdJoin, quote, teeCommand } from './util';
-import SpecResultPresenter from './SpecResultPresenter';
+import { CodeLensCommandArg } from '../rspec';
+import SpecRunnerConfig from '../SpecRunnerConfig';
+import { cmdJoin, quote, teeCommand } from '../util';
+import SpecResultPresenter from '../SpecResultPresenter';
 
 export class MinitestRunner {
   private _term!: vscode.Terminal;

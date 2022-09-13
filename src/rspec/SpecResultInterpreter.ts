@@ -3,10 +3,10 @@ import * as fs from 'fs';
 import * as tmp from 'tmp';
 import * as chokidar from 'chokidar';
 import * as path from 'path';
-import { isRspecOutput } from './util';
-import { RspecException, RspecOutput, TestResultException, TestResults } from './types';
-import { SpecRunnerConfig } from './SpecRunnerConfig';
-import SpecResultPresenter from './SpecResultPresenter';
+import { isRspecOutput } from '../util';
+import { RspecException, RspecOutput, TestResultException, TestResults } from '../types';
+import { SpecRunnerConfig } from '../SpecRunnerConfig';
+import SpecResultPresenter from '../SpecResultPresenter';
 
 export class SpecResultInterpreter {
   private config: SpecRunnerConfig;

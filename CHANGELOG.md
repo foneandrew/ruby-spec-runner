@@ -2,6 +2,10 @@
 
 All notable changes to the "spec-runner" extension will be documented in this file.
 
+## [1.1.2]
+
+- Editor decorations for test results are better at staying up to date with changes
+
 ## [1.1.1]
 
 - Better detection for when minitest fails to finish

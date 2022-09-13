@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
-import { RspecExampleStatus, TestResultException, TestResults } from './types';
+import { RspecExampleStatus, TestResultException, TestResultLineResult, TestResults } from './types';
 import SpecRunnerConfig from './SpecRunnerConfig';
 
 export class SpecResultPresenter {
@@ -63,8 +63,6 @@ export class SpecResultPresenter {
     if(!activeEditor?.document) {
       return;
     }
-
-    this.clearGutters(activeEditor);
 
     const isSpecFile = activeEditor?.document.fileName.match(/_spec\.rb$/);
     const isMinitestFile = activeEditor?.document.fileName.match(/_test\.rb$/);
@@ -158,12 +156,23 @@ export class SpecResultPresenter {
   }
 
   private syncTestResults(activeEditor: vscode.TextEditor) {
-    Object.entries(this.testResults[activeEditor.document.fileName]?.results || {}).forEach(([id, result]) => {
+    let linesToSync: [string, TestResultLineResult][] = [];
+    const currentFileName = activeEditor.document.fileName;
+    const fileResults = this.testResults[activeEditor.document.fileName];
+
+    // Find and remove lines that have been added or removed
+    Object.entries(fileResults?.results || {}).forEach(([id, result]) => {
       const content = this.contentAtLine(activeEditor.document, result.line);
 
       if(!content.startsWith(result.content)) {
-        this.syncTestResult(activeEditor, activeEditor.document.fileName, id, result.content);
+        linesToSync.push([id, result]);
+        delete this.testResults[currentFileName].results[id];
       }
+    });
+
+    // Attempt to re-add changed lines
+    linesToSync.forEach(([id, result]) => {
+      this.syncTestResult(activeEditor, currentFileName, result);
     });
   }
 
@@ -173,21 +182,21 @@ export class SpecResultPresenter {
       .forEach(([id, result]) => {
         const content = this.contentAtLine(activeEditor.document, result.exception!.line!);
 
-        if(!content.startsWith(result.exception!.content!)) {
+        if (!content.startsWith(result.exception!.content!)) {
           this.syncTestResultException(activeEditor, activeEditor.document.fileName, id, result.exception!.content!);
         }
       });
   }
 
-  private syncTestResult(activeEditor: vscode.TextEditor, fileName: string, testId: string, content: string) {
+  private syncTestResult(activeEditor: vscode.TextEditor, fileName: string, result: TestResultLineResult) {
     const lines = activeEditor.document.getText().split(/\r?\n/);
-    const trimmedContent = content.trim();
+    const trimmedContent = result.content.trim();
     const foundAtLine = lines.findIndex(line => line.trim().startsWith(trimmedContent));
 
     if (foundAtLine >= 0) {
-      this.testResults[fileName].results[testId].line = foundAtLine + 1;
-    } else {
-      delete this.testResults[fileName].results[testId];
+      const testId = (foundAtLine + 1).toString();
+      this.testResults[fileName].results[testId.toString()] = result;
+      this.testResults[fileName].results[testId.toString()].line = foundAtLine + 1;
     }
   }
 

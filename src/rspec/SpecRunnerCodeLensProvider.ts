@@ -1,6 +1,6 @@
-import { CodeLens, CodeLensProvider, Event, Position, ProviderResult, Range, TextDocument } from 'vscode';
+import { CodeLens, CodeLensProvider, Event, ProviderResult, TextDocument } from 'vscode';
 import { SpecParser } from './SpecParser';
-import SpecRunnerConfig from './SpecRunnerConfig';
+import SpecRunnerConfig from '../SpecRunnerConfig';
 
 export type CodeLensCommandArg = {
   line: number;

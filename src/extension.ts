@@ -1,15 +1,9 @@
 import * as vscode from 'vscode';
-import { SpecRunner } from './SpecRunner';
-import { SpecRunnerCodeLensProvider } from './SpecRunnerCodeLensProvider';
 import { SpecRunnerConfig } from './SpecRunnerConfig';
-import { SpecRunnerButton } from './SpecRunnerButton';
-import { FailedSpecRunnerButton } from './FailedSpecRunnerButton';
-import SpecResultInterpreter from './SpecResultInterpreter';
+import SpecResultInterpreter from './rspec/SpecResultInterpreter';
 import SpecResultPresenter from './SpecResultPresenter';
-import MinitestRunner from './MinitestRunner';
-import MinitestRunnerCodeLensProvider from './MinitestRunnerCodeLensProvider';
-import MinitestRunnerButton from './MinitestRunnerButton';
-import MinitestResultInterpreter from './MinitestResultInterpreter';
+import { MinitestRunner, MinitestRunnerCodeLensProvider, MinitestRunnerButton, MinitestResultInterpreter } from './minitest';
+import { SpecRunner, SpecRunnerCodeLensProvider, FailedSpecRunnerButton, SpecRunnerButton } from './rspec';
 
 // This method is called when the extension is activated
 export function activate(context: vscode.ExtensionContext) {
@@ -85,6 +79,10 @@ export function activate(context: vscode.ExtensionContext) {
     minitestRunnerButton.update(editor);
     resultPresenter.update();
   }));
+  context.subscriptions.push(vscode.window.onDidChangeTextEditorSelection((editor) => {
+    resultPresenter.update();
+  }));
+
 
   failedSpecRunnerButton.update();
   specRunnerButton.update();

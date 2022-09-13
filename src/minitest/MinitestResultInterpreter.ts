@@ -3,12 +3,12 @@ import * as fs from 'fs';
 import * as tmp from 'tmp';
 import * as chokidar from 'chokidar';
 import * as path from 'path';
-import { RspecExampleStatus, TestResultException, TestResults } from './types';
-import { SpecRunnerConfig } from './SpecRunnerConfig';
-import SpecResultPresenter from './SpecResultPresenter';
+import { RspecExampleStatus, TestResultException, TestResults } from '../types';
+import { SpecRunnerConfig } from '../SpecRunnerConfig';
+import SpecResultPresenter from '../SpecResultPresenter';
 import MinitestParser, { MinitestRegion } from './MinitestParser';
 
-export class SpecResultInterpreter {
+export class MinitestResultInterpreter {
   private colorCodesMatcher = /[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g;
   private summaryMatcher = /(?<tests>\d+) tests, (?<assertions>\d+) assertions, (?<failures>\d+) failures, (?<errors>\d+) errors, (?<skips>\d+) skips/;
   private skippedMatcher = /Skipped:\r?\n.+:(?<lineNumber>\d+)\]:\s*(?<message>.+)/g;
@@ -281,4 +281,4 @@ export class SpecResultInterpreter {
   }
 }
 
-export default SpecResultInterpreter;
+export default MinitestResultInterpreter;

@@ -48,19 +48,21 @@ export interface TestResultException {
   content?: string;
 }
 
+export interface TestResultLineResult {
+  id: string; // Test id
+  testRun: string;
+  line: number;
+  content: string;
+  status: RspecExampleStatus;
+  exception?: TestResultException;
+}
+
 export interface TestResults {
   [key: string]: { // File path
     testRun: string;
     testRunPending: boolean;
     results: {
-      [key: string]: { // Line number
-        id: string; // Test id
-        testRun: string;
-        line: number;
-        content: string;
-        status: RspecExampleStatus;
-        exception?: TestResultException;
-      }
+      [key: string]: TestResultLineResult; // Line number
     }
   }
 }

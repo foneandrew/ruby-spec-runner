@@ -1,8 +1,8 @@
 import * as vscode from 'vscode';
 import { CodeLensCommandArg } from './SpecRunnerCodeLensProvider';
-import SpecRunnerConfig from './SpecRunnerConfig';
-import { cmdJoin, quote } from './util';
-import SpecResultPresenter from './SpecResultPresenter';
+import SpecRunnerConfig from '../SpecRunnerConfig';
+import { cmdJoin, quote } from '../util';
+import SpecResultPresenter from '../SpecResultPresenter';
 
 export class SpecRunner {
   private _term!: vscode.Terminal;
