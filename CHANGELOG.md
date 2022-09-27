@@ -2,6 +2,10 @@
 
 All notable changes to the "spec-runner" extension will be documented in this file.
 
+## [1.1.6]
+
+- Bug fix (was sometimes accessing property of undefined (－‸ლ))
+
 ## [1.1.5]
 
 - Code lens support for rspec describe blocks with modules (eg. "describe MyModule::MyClass")

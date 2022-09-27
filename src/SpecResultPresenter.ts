@@ -274,18 +274,7 @@ export class SpecResultPresenter {
   }
 
   private currentTestRun(activeEditor: vscode.TextEditor) {
-    return this.testResults[activeEditor.document.fileName].testRun;
-  }
-
-  private clearGutters(activeEditor: vscode.TextEditor) {
-    activeEditor.setDecorations(this.passedGutter, []);
-    activeEditor.setDecorations(this.stalePassedGutter, []);
-    activeEditor.setDecorations(this.pendingGutter, []);
-    activeEditor.setDecorations(this.stalePendingGutter, []);
-    activeEditor.setDecorations(this.testRunPendingGutter, []);
-    activeEditor.setDecorations(this.failedGutter, []);
-    activeEditor.setDecorations(this.failedLine, []);
-    activeEditor.setDecorations(this.staleFailedLine, []);
+    return this.testResults[activeEditor.document.fileName]?.testRun;
   }
 
   private get testResults() {
