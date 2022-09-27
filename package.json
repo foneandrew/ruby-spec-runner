@@ -9,7 +9,7 @@
 	},
 	"icon": "images/icon.png",
 	"license": "MIT",
-	"version": "1.1.7",
+	"version": "2.0.0",
 	"engines": {
 		"vscode": "^1.70.0"
 	},
@@ -28,25 +28,29 @@
 	"contributes": {
 		"commands": [
 			{
-				"command": "extension.runRspecOrMinitestFile",
+				"command": "ruby-spec-runner.runRspecOrMinitestFile",
 				"title": "Ruby Spec Runner: Run this spec/minitest file"
 			},
 			{
-				"command": "extension.runSpec",
-				"title": "Ruby Spec Runner: Run this spec"
+				"command": "ruby-spec-runner.runSpec",
+				"title": "Ruby Spec Runner: Run this rspec spec"
 			},
 			{
-				"command": "extension.runFailedExamples",
+				"command": "ruby-spec-runner.runFailedExamples",
 				"title": "Ruby Spec Runner: Re-run failed examples"
 			},
 			{
-				"command": "extension.runMinitest",
-				"title": "Ruby Spec Runner: Run this test"
+				"command": "ruby-spec-runner.runMinitest",
+				"title": "Ruby Spec Runner: Run this minitest test"
+			},
+			{
+				"command": "ruby-spec-runner.clearResults",
+				"title": "Ruby Spec Runner: Clear test results for this file"
 			}
 		],
 		"keybindings": [
 			{
-				"command": "extension.runRspecOrMinitestFile",
+				"command": "ruby-spec-runner.runRspecOrMinitestFile",
 				"key": "ctrl+alt+/",
 				"mac": "ctrl+cmd+/"
 			}
@@ -130,10 +134,22 @@
 					"description": "Rspec: Highlight errors, show spec results in the gutter, and highlighting in the overview ruler.",
 					"scope": "window"
 				},
+				"ruby-spec-runner.rspecDecorateEditorWithStaleResults": {
+					"type": "boolean",
+					"default": true,
+					"markdownDescription": "Rspec: Display stale results in the editor gutter and overview ruler. Disable to hide stale results. Only applies when `Rspec Decorate Editor With Results` is enabled.",
+					"scope": "window"
+				},
 				"ruby-spec-runner.minitestDecorateEditorWithResults": {
 					"type": "boolean",
 					"default": true,
 					"markdownDescription": "Minitest: Highlight errors, show spec results in the gutter, and highlighting in the overview ruler.\n\n**Windows users: turn this off if the minitest command is failing or check the spec runner windowsTerminalType configuration.**",
+					"scope": "window"
+				},
+				"ruby-spec-runner.minitestDecorateEditorWithStaleResults": {
+					"type": "boolean",
+					"default": true,
+					"markdownDescription": "Minitest: Display stale results in the editor gutter and overview ruler. Disable to hide stale results. Only applies when `Minitest Decorate Editor With Results` is enabled.",
 					"scope": "window"
 				},
 				"ruby-spec-runner.windowsTerminalType": {

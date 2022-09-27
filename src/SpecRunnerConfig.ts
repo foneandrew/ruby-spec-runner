@@ -70,8 +70,16 @@ export class SpecRunnerConfig {
     return this.getBooleanConfig('ruby-spec-runner.rspecDecorateEditorWithResults', true);
   }
 
+  get rspecDecorateEditorWithStaleResults(): boolean {
+    return this.getBooleanConfig('ruby-spec-runner.rspecDecorateEditorWithStaleResults', true);
+  }
+
   get minitestDecorateEditorWithResults(): boolean {
     return this.getBooleanConfig('ruby-spec-runner.minitestDecorateEditorWithResults', true);
+  }
+
+  get minitestDecorateEditorWithStaleResults(): boolean {
+    return this.getBooleanConfig('ruby-spec-runner.minitestDecorateEditorWithStaleResults', true);
   }
 
   private getBooleanConfig(key: string, defaultValue: boolean) {

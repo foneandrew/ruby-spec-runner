@@ -36,7 +36,7 @@ export class MinitestRunnerCodeLensProvider implements CodeLensProvider {
             name: testRegion.name,
             line: testRegion.range.start.line + 1
           }],
-          command: 'extension.runMinitest',
+          command: 'ruby-spec-runner.runMinitest',
           tooltip: 'Run this test in minitest'
         }
       ));

@@ -36,7 +36,7 @@ export class SpecRunnerCodeLensProvider implements CodeLensProvider {
             name: specRegion.name,
             line: specRegion.range.start.line + 1
           }],
-          command: 'extension.runSpec',
+          command: 'ruby-spec-runner.runSpec',
           tooltip: 'Run this example/context in rspec'
         }
       ));

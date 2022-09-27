@@ -23,7 +23,7 @@ export class FailedSpecRunnerButton {
     }
 
     this.button.text = '$(testing-run-icon) Run failed examples';
-    this.button.command = 'extension.runFailedExamples';
+    this.button.command = 'ruby-spec-runner.runFailedExamples';
     this.button.show();
   }
 }

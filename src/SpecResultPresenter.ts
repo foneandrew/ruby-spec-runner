@@ -57,10 +57,23 @@ export class SpecResultPresenter {
     this.update();
   }
 
-  update() {
+  clearTestResults() {
     const activeEditor = vscode.window.activeTextEditor;
 
     if(!activeEditor?.document) {
+      return;
+    }
+
+    delete this.testResults[activeEditor.document.fileName];
+    this.clearGutters(activeEditor);
+
+    this.update();
+  }
+
+  update() {
+    const activeEditor = vscode.window.activeTextEditor;
+
+    if(!activeEditor?.document || !this.testResults[activeEditor.document.fileName]) {
       return;
     }
 
@@ -75,7 +88,7 @@ export class SpecResultPresenter {
       return;
     }
 
-    if (isMinitestFile&& !this.config.minitestDecorateEditorWithResults) {
+    if (isMinitestFile && !this.config.minitestDecorateEditorWithResults) {
       return;
     }
 
@@ -83,7 +96,6 @@ export class SpecResultPresenter {
     this.syncTestResultExceptions(activeEditor);
 
     activeEditor.setDecorations(this.failedLine, this.getFailedLineDecorations(activeEditor, false, error => `Test failed: ${error}`));
-    activeEditor.setDecorations(this.staleFailedLine, this.getFailedLineDecorations(activeEditor, true, error => `Test failed (stale): ${error}`));
 
     activeEditor.setDecorations(this.passedGutter, this.getDecorations(
       activeEditor,
@@ -94,30 +106,12 @@ export class SpecResultPresenter {
         forPendingTestRun: false
       }
     ));
-    activeEditor.setDecorations(this.stalePassedGutter, this.getDecorations(
-      activeEditor,
-      'Passed (stale)',
-      {
-        state: RspecExampleStatus.Passed,
-        forCurrentTestRun: false,
-        forPendingTestRun: false
-      }
-    ));
     activeEditor.setDecorations(this.pendingGutter, this.getDecorations(
       activeEditor,
       'Pending',
       {
         state: RspecExampleStatus.Pending,
         forCurrentTestRun: true,
-        forPendingTestRun: false
-      }
-    ));
-    activeEditor.setDecorations(this.stalePendingGutter, this.getDecorations(
-      activeEditor,
-      'Pending (stale)',
-      {
-        state: RspecExampleStatus.Pending,
-        forCurrentTestRun: false,
         forPendingTestRun: false
       }
     ));
@@ -137,15 +131,39 @@ export class SpecResultPresenter {
         forPendingTestRun: false
       }
     ));
-    activeEditor.setDecorations(this.staleFailedGutter, this.getDecorations(
-      activeEditor,
-      exception => `Failed (stale): ${exception?.message}`,
-      {
-        state: RspecExampleStatus.Failed,
-        forCurrentTestRun: false,
-        forPendingTestRun: false
-      }
-    ));
+
+    if ((isSpecFile && this.config.rspecDecorateEditorWithStaleResults) || (isMinitestFile && this.config.minitestDecorateEditorWithStaleResults)) {
+      activeEditor.setDecorations(this.stalePassedGutter, this.getDecorations(
+        activeEditor,
+        'Passed (stale)',
+        {
+          state: RspecExampleStatus.Passed,
+          forCurrentTestRun: false,
+          forPendingTestRun: false
+        }
+      ));
+      activeEditor.setDecorations(this.stalePendingGutter, this.getDecorations(
+        activeEditor,
+        'Pending (stale)',
+        {
+          state: RspecExampleStatus.Pending,
+          forCurrentTestRun: false,
+          forPendingTestRun: false
+        }
+      ));
+      activeEditor.setDecorations(this.staleFailedGutter, this.getDecorations(
+        activeEditor,
+        exception => `Failed (stale): ${exception?.message}`,
+        {
+          state: RspecExampleStatus.Failed,
+          forCurrentTestRun: false,
+          forPendingTestRun: false
+        }
+      ));
+      activeEditor.setDecorations(this.staleFailedLine, this.getFailedLineDecorations(activeEditor, true, error => `Test failed (stale): ${error}`));
+    } else {
+      this.clearGutters(activeEditor, true);
+    }
   }
 
   setPending(testFile: string) {
@@ -275,6 +293,21 @@ export class SpecResultPresenter {
 
   private currentTestRun(activeEditor: vscode.TextEditor) {
     return this.testResults[activeEditor.document.fileName]?.testRun;
+  }
+
+  private clearGutters(activeEditor: vscode.TextEditor, staleOnly = false) {
+    if (!staleOnly) {
+      activeEditor.setDecorations(this.passedGutter, []);
+      activeEditor.setDecorations(this.pendingGutter, []);
+      activeEditor.setDecorations(this.testRunPendingGutter, []);
+      activeEditor.setDecorations(this.failedGutter, []);
+      activeEditor.setDecorations(this.failedLine, []);
+    }
+
+    activeEditor.setDecorations(this.stalePassedGutter, []);
+    activeEditor.setDecorations(this.stalePendingGutter, []);
+    activeEditor.setDecorations(this.staleFailedGutter, []);
+    activeEditor.setDecorations(this.staleFailedLine, []);
   }
 
   private get testResults() {

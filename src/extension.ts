@@ -18,7 +18,7 @@ export function activate(context: vscode.ExtensionContext) {
   const minitestRunner = new MinitestRunner(config, minitestInterpreter.outputFilePath, resultPresenter);
 
   const runRspecOrMinitestFile = vscode.commands.registerCommand(
-    'extension.runRspecOrMinitestFile',
+    'ruby-spec-runner.runRspecOrMinitestFile',
     async (...args) => {
       const filePath = vscode.window.activeTextEditor?.document.fileName;
       if (!filePath) {
@@ -36,16 +36,20 @@ export function activate(context: vscode.ExtensionContext) {
   );
 
   const runSpec = vscode.commands.registerCommand(
-    'extension.runSpec',
+    'ruby-spec-runner.runSpec',
     async (...args) => specRunner.runSpec(...args)
   );
   const runFailedExample = vscode.commands.registerCommand(
-    'extension.runFailedExamples',
+    'ruby-spec-runner.runFailedExamples',
     async () => specRunner.runFailedExample()
   );
   const runMinitest = vscode.commands.registerCommand(
-    'extension.runMinitest',
+    'ruby-spec-runner.runMinitest',
     async (...args) => minitestRunner.runTest(...args)
+  );
+  const clearResults = vscode.commands.registerCommand(
+    'ruby-spec-runner.clearResults',
+    async () => resultPresenter.clearTestResults()
   );
 
   const specCodeLensProvider = new SpecRunnerCodeLensProvider(config);
@@ -67,6 +71,7 @@ export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(runRspecOrMinitestFile);
   context.subscriptions.push(runSpec);
   context.subscriptions.push(runMinitest);
+  context.subscriptions.push(clearResults);
   context.subscriptions.push(runFailedExample);
   context.subscriptions.push(specCodeLensProviderDisposable);
   context.subscriptions.push(minitestCodeLensProviderDisposable);

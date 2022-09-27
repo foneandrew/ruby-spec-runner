@@ -2,6 +2,12 @@
 
 All notable changes to the "spec-runner" extension will be documented in this file.
 
+## [2.0.0]
+
+- **BREAKING** Rename extension commands. Any customised keyboard shortcuts for this extension will no longer work
+- Add command to clear test results
+- Add configuration to hide stale results
+
 ## [1.1.7]
 
 - Bug fix (was unable to reopen SpecRunner and MinitestRunner terminals if they were closed)
