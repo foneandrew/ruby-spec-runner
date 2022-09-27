@@ -80,7 +80,11 @@ export class MinitestRunner {
   }
 
   private get terminal() {
-    return this._term ||= vscode.window.createTerminal('MinitestRunner');
+    if (!this._term || this._term.exitStatus) {
+      this._term = vscode.window.createTerminal('MinitestRunner');
+    }
+
+    return this._term;
   }
 };
 

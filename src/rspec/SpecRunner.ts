@@ -84,7 +84,11 @@ export class SpecRunner {
   }
 
   private get terminal() {
-    return this._term ||= vscode.window.createTerminal('SpecRunner');
+    if (!this._term || this._term.exitStatus) {
+      this._term = vscode.window.createTerminal('SpecRunner');
+    }
+
+    return this._term;
   }
 };
 

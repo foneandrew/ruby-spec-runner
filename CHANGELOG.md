@@ -2,6 +2,10 @@
 
 All notable changes to the "spec-runner" extension will be documented in this file.
 
+## [1.1.7]
+
+- Bug fix (was unable to reopen SpecRunner and MinitestRunner terminals if they were closed)
+
 ## [1.1.6]
 
 - Bug fix (was sometimes accessing property of undefined (－‸ლ))
