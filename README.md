@@ -43,6 +43,7 @@ This extension contributes the following settings:
 - `ruby-spec-runner.minitestDecorateEditorWithResults`: Show the results of minitest runs in the editor
 - `ruby-spec-runner.minitestDecorateEditorWithStaleResults`: Show stale results of minitest runs in the editor
 - `ruby-spec-runner.windowsTerminalType`: For windows users that are using bash instead of powershell
+- `ruby-spec-runner.overviewHighlightPosition`: Configure the position of result highlights in the overview ruler
 
 ## Known Issues
 

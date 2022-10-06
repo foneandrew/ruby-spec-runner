@@ -3,39 +3,46 @@ import * as path from 'path';
 import { RspecExampleStatus, TestResultException, TestResultLineResult, TestResults } from './types';
 import SpecRunnerConfig from './SpecRunnerConfig';
 
+interface ConfigurableEditorDecorations {
+  passedGutter: vscode.TextEditorDecorationType;
+  stalePassedGutter: vscode.TextEditorDecorationType;
+  pendingGutter: vscode.TextEditorDecorationType;
+  stalePendingGutter: vscode.TextEditorDecorationType;
+  failedGutter: vscode.TextEditorDecorationType;
+  staleFailedGutter: vscode.TextEditorDecorationType;
+};
+
+interface ConfigurableEditorDecorationsCollection {
+  left: ConfigurableEditorDecorations;
+  right: ConfigurableEditorDecorations;
+  center: ConfigurableEditorDecorations;
+}
+
 export class SpecResultPresenter {
   private _testResults!: TestResults;
   private config: SpecRunnerConfig;
 
-  private passedGutter: vscode.TextEditorDecorationType;
-  private stalePassedGutter: vscode.TextEditorDecorationType;
-  private pendingGutter: vscode.TextEditorDecorationType;
-  private stalePendingGutter: vscode.TextEditorDecorationType;
+  private _editorDecorations: ConfigurableEditorDecorationsCollection;
+
   private testRunPendingGutter: vscode.TextEditorDecorationType;
-  private failedGutter: vscode.TextEditorDecorationType;
-  private staleFailedGutter: vscode.TextEditorDecorationType;
   private failedLine: vscode.TextEditorDecorationType;
   private staleFailedLine: vscode.TextEditorDecorationType;
 
   constructor(context: vscode.ExtensionContext, config: SpecRunnerConfig) {
-    this.passedGutter = vscode.window.createTextEditorDecorationType({ gutterIconPath: path.join(__dirname, '..', 'resources', 'passed.svg'), overviewRulerColor: '#69e06dba', overviewRulerLane: vscode.OverviewRulerLane.Left });
-    this.stalePassedGutter = vscode.window.createTextEditorDecorationType({ gutterIconPath: path.join(__dirname, '..', 'resources', 'passed_stale.svg'), overviewRulerColor: '#69e06dba', overviewRulerLane: vscode.OverviewRulerLane.Left });
-    this.pendingGutter = vscode.window.createTextEditorDecorationType({ gutterIconPath: path.join(__dirname, '..', 'resources', 'pending.svg'), overviewRulerColor: '#e0be69ba', overviewRulerLane: vscode.OverviewRulerLane.Left });
-    this.stalePendingGutter = vscode.window.createTextEditorDecorationType({ gutterIconPath: path.join(__dirname, '..', 'resources', 'pending_stale.svg'), overviewRulerColor: '#e0be69ba', overviewRulerLane: vscode.OverviewRulerLane.Left });
-    this.testRunPendingGutter = vscode.window.createTextEditorDecorationType({ gutterIconPath: path.join(__dirname, '..', 'resources', 'test_run_pending.svg') });
-    this.failedGutter = vscode.window.createTextEditorDecorationType({ gutterIconPath: path.join(__dirname, '..', 'resources', 'failed.svg'), overviewRulerColor: '#e15656ba', overviewRulerLane: vscode.OverviewRulerLane.Left });
-    this.staleFailedGutter = vscode.window.createTextEditorDecorationType({ gutterIconPath: path.join(__dirname, '..', 'resources', 'failed_stale.svg'), overviewRulerColor: '#e15656ba', overviewRulerLane: vscode.OverviewRulerLane.Left });
+    this._editorDecorations = this.buildConfigurableEditorDecorations();
+
+    this.testRunPendingGutter = this.buildEditorDecoration('test_run_pending.svg');
     this.failedLine = vscode.window.createTextEditorDecorationType({ backgroundColor: '#dc113766', overviewRulerColor: '#e15656ba', overviewRulerLane: vscode.OverviewRulerLane.Full });
     this.staleFailedLine = vscode.window.createTextEditorDecorationType({ backgroundColor: '#dc113733', overviewRulerColor: '#dc113766', overviewRulerLane: vscode.OverviewRulerLane.Full });
 
     this.config = config;
 
-    context.subscriptions.push(this.passedGutter);
-    context.subscriptions.push(this.stalePassedGutter);
-    context.subscriptions.push(this.pendingGutter);
-    context.subscriptions.push(this.stalePendingGutter);
+    Object.values(this._editorDecorations).forEach((decorations: ConfigurableEditorDecorations) => {
+      Object.values(decorations).forEach((decoration: vscode.TextEditorDecorationType) => {
+        context.subscriptions.push(decoration);
+      });
+    });
     context.subscriptions.push(this.testRunPendingGutter);
-    context.subscriptions.push(this.failedGutter);
     context.subscriptions.push(this.failedLine);
   }
 
@@ -297,21 +304,74 @@ export class SpecResultPresenter {
 
   private clearGutters(activeEditor: vscode.TextEditor, staleOnly = false) {
     if (!staleOnly) {
-      activeEditor.setDecorations(this.passedGutter, []);
-      activeEditor.setDecorations(this.pendingGutter, []);
       activeEditor.setDecorations(this.testRunPendingGutter, []);
-      activeEditor.setDecorations(this.failedGutter, []);
       activeEditor.setDecorations(this.failedLine, []);
+
+      (['left', 'right', 'center'] as Array<'left' | 'right' | 'center'>).forEach(position => {
+        activeEditor.setDecorations(this._editorDecorations[position].passedGutter, []);
+        activeEditor.setDecorations(this._editorDecorations[position].pendingGutter, []);
+        activeEditor.setDecorations(this._editorDecorations[position].failedGutter, []);
+      });
     }
 
-    activeEditor.setDecorations(this.stalePassedGutter, []);
-    activeEditor.setDecorations(this.stalePendingGutter, []);
-    activeEditor.setDecorations(this.staleFailedGutter, []);
     activeEditor.setDecorations(this.staleFailedLine, []);
+
+    (['left', 'right', 'center'] as Array<'left' | 'right' | 'center'>).forEach(position => {
+      activeEditor.setDecorations(this._editorDecorations[position].stalePassedGutter, []);
+      activeEditor.setDecorations(this._editorDecorations[position].stalePendingGutter, []);
+      activeEditor.setDecorations(this._editorDecorations[position].staleFailedGutter, []);
+    });
   }
 
   private get testResults() {
     return this._testResults ||= {};
+  }
+
+  private get passedGutter() {
+    return this._editorDecorations[this.config.overviewHighlightPosition].passedGutter;
+  }
+
+  private get stalePassedGutter() {
+    return this._editorDecorations[this.config.overviewHighlightPosition].stalePassedGutter;
+  }
+
+  private get pendingGutter() {
+    return this._editorDecorations[this.config.overviewHighlightPosition].pendingGutter;
+  }
+
+  private get stalePendingGutter() {
+    return this._editorDecorations[this.config.overviewHighlightPosition].stalePendingGutter;
+  }
+
+  private get failedGutter() {
+    return this._editorDecorations[this.config.overviewHighlightPosition].failedGutter;
+  }
+
+  private get staleFailedGutter() {
+    return this._editorDecorations[this.config.overviewHighlightPosition].staleFailedGutter;
+  }
+
+
+  private buildConfigurableEditorDecorations(): ConfigurableEditorDecorationsCollection {
+    const decorations: Partial<ConfigurableEditorDecorationsCollection>  = {};
+
+    ([['left', vscode.OverviewRulerLane.Left], ['right', vscode.OverviewRulerLane.Right], ['center', vscode.OverviewRulerLane.Center]] as ['left' | 'right' | 'center', vscode.OverviewRulerLane][])
+      .forEach(([key, position]) => {
+        decorations[key] = {
+          passedGutter: this.buildEditorDecoration('passed.svg', '#69e06dba', position),
+          stalePassedGutter: this.buildEditorDecoration('passed_stale.svg', '#69e06dba', position),
+          pendingGutter: this.buildEditorDecoration('pending.svg', '#e0be69ba', position),
+          stalePendingGutter: this.buildEditorDecoration('pending_stale.svg', '#e0be69ba', position),
+          failedGutter: this.buildEditorDecoration('failed.svg', '#e15656ba', position),
+          staleFailedGutter: this.buildEditorDecoration('failed_stale.svg', '#e15656ba', position)
+        };
+      });
+
+    return decorations as ConfigurableEditorDecorationsCollection;
+  }
+
+  private buildEditorDecoration(icon: string, color?: string, position?: vscode.OverviewRulerLane) {
+    return vscode.window.createTextEditorDecorationType({ gutterIconPath: path.join(__dirname, '..', 'resources', icon), overviewRulerColor: color, overviewRulerLane: position });
   }
 }
 

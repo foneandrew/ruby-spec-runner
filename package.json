@@ -9,7 +9,7 @@
 	},
 	"icon": "images/icon.png",
 	"license": "MIT",
-	"version": "2.1.0",
+	"version": "2.2.0",
 	"engines": {
 		"vscode": "^1.70.0"
 	},
@@ -160,6 +160,17 @@
 					],
 					"default": "Powershell",
 					"markdownDescription": "Select the vscode default terminal for windows machines. Affects the command used for minitest editor decoration.",
+					"scope": "window"
+				},
+				"ruby-spec-runner.overviewHighlightPosition": {
+					"type": "string",
+					"enum": [
+						"Left",
+						"Right",
+						"Center"
+					],
+					"default": "Left",
+					"markdownDescription": "Select which side test results appear in the overview ruler. Can be useful if another extension uses a particular side of the overview ruler (eg git lens). Only applies when editor decorations are on.\n\n_(Does not apply to line failures which are always full width)_",
 					"scope": "window"
 				}
 			}

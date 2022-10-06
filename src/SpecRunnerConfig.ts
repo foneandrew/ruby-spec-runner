@@ -31,6 +31,19 @@ export class SpecRunnerConfig {
     };
   }
 
+  get overviewHighlightPosition() {
+    const format = vscode.workspace.getConfiguration().get('ruby-spec-runner.overviewHighlightPosition') as string | undefined;
+
+    switch (format) {
+      case 'Right':
+        return 'right';
+      case 'Center':
+        return 'center';
+      default:
+        return 'left';
+    };
+  }
+
   get usingBashInWindows(): boolean {
     const format = vscode.workspace.getConfiguration().get('ruby-spec-runner.windowsTerminalType') as string | undefined;
 

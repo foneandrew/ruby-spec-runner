@@ -2,6 +2,10 @@
 
 All notable changes to the "spec-runner" extension will be documented in this file.
 
+## [2.2.0]
+
+- Add option to configure the position of results highlighting in the overview ruler
+
 ## [2.1.0]
 
 - Clarify the confusing wording for pending and skipped tests in the editor decorations
