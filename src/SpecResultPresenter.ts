@@ -108,7 +108,7 @@ export class SpecResultPresenter {
     ));
     activeEditor.setDecorations(this.pendingGutter, this.getDecorations(
       activeEditor,
-      'Pending',
+      'Test is skipped',
       {
         state: RspecExampleStatus.Pending,
         forCurrentTestRun: true,
@@ -117,7 +117,7 @@ export class SpecResultPresenter {
     ));
     activeEditor.setDecorations(this.testRunPendingGutter, this.getDecorations(
       activeEditor,
-      'Tests are running...',
+      'Awaiting test results...',
       {
         forPendingTestRun: true
       }
@@ -144,7 +144,7 @@ export class SpecResultPresenter {
       ));
       activeEditor.setDecorations(this.stalePendingGutter, this.getDecorations(
         activeEditor,
-        'Pending (stale)',
+        'Test is skipped (stale)',
         {
           state: RspecExampleStatus.Pending,
           forCurrentTestRun: false,

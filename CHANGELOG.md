@@ -2,6 +2,10 @@
 
 All notable changes to the "spec-runner" extension will be documented in this file.
 
+## [2.1.0]
+
+- Clarify the confusing wording for pending and skipped tests in the editor decorations
+
 ## [2.0.0]
 
 - **BREAKING** Rename extension commands. Any customised keyboard shortcuts for this extension will no longer work
