@@ -2,6 +2,10 @@
 
 All notable changes to the "spec-runner" extension will be documented in this file.
 
+## [2.2.1]
+
+- When a file is changed the extension will try and be a bit smarter about how it figures out where the decorated lines have moved to. It's still using a dumb solution and will sometimes get it wrong, but hopefully less wrong than before.
+
 ## [2.2.0]
 
 - Add option to configure the position of results highlighting in the overview ruler

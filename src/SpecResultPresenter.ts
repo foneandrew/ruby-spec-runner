@@ -181,7 +181,8 @@ export class SpecResultPresenter {
   }
 
   private syncTestResults(activeEditor: vscode.TextEditor) {
-    let linesToSync: [string, TestResultLineResult][] = [];
+    // [id, result, trimmedLineContent, newLineNumbers[]]
+    let linesToSync: [string, TestResultLineResult, string, number[]][] = [];
     const currentFileName = activeEditor.document.fileName;
     const fileResults = this.testResults[activeEditor.document.fileName];
 
@@ -190,52 +191,74 @@ export class SpecResultPresenter {
       const content = this.contentAtLine(activeEditor.document, result.line);
 
       if(!content.startsWith(result.content)) {
-        linesToSync.push([id, result]);
+        linesToSync.push([id, result, result.content.trim(), []]);
         delete this.testResults[currentFileName].results[id];
       }
     });
 
-    // Attempt to re-add changed lines
-    linesToSync.forEach(([id, result]) => {
-      this.syncTestResult(activeEditor, currentFileName, result);
+    // Find new matching lines
+    const lines = activeEditor.document.getText().split(/\r?\n/);
+    lines.forEach((line, lineNumber) => {
+      linesToSync.forEach(([id, result, trimmedLineContent, newLineNumbers]) => {
+        if (line.trim() === trimmedLineContent) {
+          newLineNumbers.push(lineNumber + 1);
+        }
+      });
+    });
+
+    // Update lines that have been moved
+    linesToSync.forEach(([id, result, trimmedLineContent, newLineNumbers]) => {
+      if (newLineNumbers.length > 0) {
+        const newLine = this.selectNewLineNumber(newLineNumbers, result.line);
+        const testId = (newLine + 1).toString();
+        this.testResults[currentFileName].results[testId.toString()] = result;
+        this.testResults[currentFileName].results[testId.toString()].line = newLine;
+      }
     });
   }
 
   private syncTestResultExceptions(activeEditor: vscode.TextEditor) {
-    Object.entries(this.testResults[activeEditor.document.fileName]?.results || {})
+    // [id, exception, trimmedLineContent, newLineNumbers[]]
+    let linesToSync: [string, TestResultException, string, number[]][] = [];
+    const currentFileName = activeEditor.document.fileName;
+
+    Object.entries(this.testResults[currentFileName]?.results || {})
       .filter(([_id, result]) => result.status === RspecExampleStatus.Failed && result.exception?.line && result.exception?.content)
       .forEach(([id, result]) => {
         const content = this.contentAtLine(activeEditor.document, result.exception!.line!);
 
         if (!content.startsWith(result.exception!.content!)) {
-          this.syncTestResultException(activeEditor, activeEditor.document.fileName, id, result.exception!.content!);
+          linesToSync.push([id, result.exception!, result.exception!.content!.trim(), []]);
         }
       });
+
+    // Find new matching lines
+    const lines = activeEditor.document.getText().split(/\r?\n/);
+    lines.forEach((line, lineNumber) => {
+      linesToSync.forEach(([id, exception, trimmedLineContent, newLineNumbers]) => {
+        if (line.trim() === trimmedLineContent) {
+          newLineNumbers.push(lineNumber + 1);
+        }
+      });
+    });
+
+    // Update lines that have been moved
+    linesToSync.forEach(([id, exception, trimmedLineContent, newLineNumbers]) => {
+      if (newLineNumbers.length > 0) {
+        const newLine = this.selectNewLineNumber(newLineNumbers, exception.line!);
+        this.testResults[currentFileName].results[id.toString()].exception!.line = newLine;
+      } else {
+        delete this.testResults[currentFileName].results[id].exception?.line;
+        delete this.testResults[currentFileName].results[id].exception?.content;
+      }
+    });
   }
 
-  private syncTestResult(activeEditor: vscode.TextEditor, fileName: string, result: TestResultLineResult) {
-    const lines = activeEditor.document.getText().split(/\r?\n/);
-    const trimmedContent = result.content.trim();
-    const foundAtLine = lines.findIndex(line => line.trim().startsWith(trimmedContent));
-
-    if (foundAtLine >= 0) {
-      const testId = (foundAtLine + 1).toString();
-      this.testResults[fileName].results[testId.toString()] = result;
-      this.testResults[fileName].results[testId.toString()].line = foundAtLine + 1;
-    }
-  }
-
-  private syncTestResultException(activeEditor: vscode.TextEditor, fileName: string, testId: string, content: string) {
-    const lines = activeEditor.document.getText().split(/\r?\n/);
-    const trimmedContent = content.trim();
-    const foundAtLine = lines.findIndex(line => line.trim().startsWith(trimmedContent));
-
-    if (foundAtLine >= 0) {
-      this.testResults[fileName].results[testId].exception!.line = foundAtLine + 1;
-    } else {
-      delete this.testResults[fileName].results[testId].exception?.line;
-      delete this.testResults[fileName].results[testId].exception?.content;
-    }
+  /**
+   * Attempt to find the closest line number to the original line number
+   */
+  private selectNewLineNumber(newLineNumbers: number[], originalLine: number) {
+    return newLineNumbers.sort((a, b) => Math.abs(a - originalLine) - Math.abs(b - originalLine))[0];
   }
 
   private getFailedLineDecorations(activeEditor: vscode.TextEditor, stale: boolean, message: (error?: string) => string): vscode.DecorationOptions[] {
