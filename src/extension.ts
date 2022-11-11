@@ -3,7 +3,8 @@ import { SpecRunnerConfig } from './SpecRunnerConfig';
 import SpecResultInterpreter from './rspec/SpecResultInterpreter';
 import SpecResultPresenter from './SpecResultPresenter';
 import { MinitestRunner, MinitestRunnerCodeLensProvider, MinitestRunnerButton, MinitestResultInterpreter } from './minitest';
-import { SpecRunner, SpecRunnerCodeLensProvider, FailedSpecRunnerButton, SpecRunnerButton, CodeLensCommandArg } from './rspec';
+import { SpecRunner, SpecRunnerCodeLensProvider, FailedSpecRunnerButton, SpecRunnerButton } from './rspec';
+import { RunRspecOrMinitestArg } from './types';
 
 // This method is called when the extension is activated
 export function activate(context: vscode.ExtensionContext) {
@@ -47,7 +48,7 @@ export function activate(context: vscode.ExtensionContext) {
         return;
       }
 
-      const args: CodeLensCommandArg = {
+      const args: RunRspecOrMinitestArg = {
         fileName: filePath,
         line: line + 1,
       };

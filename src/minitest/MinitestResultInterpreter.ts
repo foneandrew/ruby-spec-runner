@@ -56,14 +56,21 @@ export class MinitestResultInterpreter {
       return;
     }
 
-    let testRunLineNumber: number | undefined;
-    if (line.match(/^\d+$/)) {
-      testRunLineNumber = parseInt(line);
-    }
+    const match = line.match(/^(?<lineNumber>\d+)\s?(?<fromCodeLens>true)?$/);
+    let testRunLineNumber = match?.groups?.lineNumber ? parseInt(match?.groups?.lineNumber) : undefined;
+    const fromCodeLens = match?.groups?.fromCodeLens;
 
     const strippedOutput = minitestOutput.replace(this.colorCodesMatcher, '');
     const regions = new MinitestParser(file).getTestRegions();
     const reversedTestLines = regions.map(r => r.range.start.line + 1).reverse();
+
+    // eslint-disable-next-line eqeqeq
+    if (testRunLineNumber != null && !fromCodeLens) {
+      // Keyboard shortcut was used to run the test
+      // Need to find the line of the test that was run
+      // Will probably be the first test line above the line that was run
+      testRunLineNumber = reversedTestLines.filter(line => line <= testRunLineNumber!)[0];
+    }
 
     const testResults: TestResults = {};
     const testRun = Date.now().toString();

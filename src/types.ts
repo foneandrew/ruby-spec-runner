@@ -12,6 +12,13 @@ export interface RspecException {
   backtrace: string[];
 }
 
+export type RunRspecOrMinitestArg = {
+  line: number;
+  fileName: string;
+  name?: string;
+  fromCodeLens?: boolean;
+};
+
 type RspecExample = {
   id: string; // "./spec/unit/models/account_event_spec.rb[1:3:1]"
   description: string;

@@ -1,8 +1,8 @@
 import * as vscode from 'vscode';
-import { CodeLensCommandArg } from '../rspec';
 import SpecRunnerConfig from '../SpecRunnerConfig';
 import { cmdJoin, quote, teeCommand } from '../util';
 import SpecResultPresenter from '../SpecResultPresenter';
+import { RunRspecOrMinitestArg } from '../types';
 
 export class MinitestRunner {
   private _term!: vscode.Terminal;
@@ -16,21 +16,21 @@ export class MinitestRunner {
     this.presenter = presenter;
   }
 
-  async runTest(arg?: CodeLensCommandArg) {
+  async runTest(arg?: RunRspecOrMinitestArg) {
     if (this.config.saveBeforeRunning) {
       await vscode.commands.executeCommand('workbench.action.files.save');
     }
 
     if (arg?.fileName) {
-      this.runTestForFile(arg.fileName, arg.line, arg.name);
+      this.runTestForFile(arg.fileName, arg.line, arg.name, arg.fromCodeLens);
     } else {
       this.runCurrentTest();
     }
   }
 
-  async runTestForFile(fileName: string, line?: number, testName?: string) {
+  async runTestForFile(fileName: string, line?: number, testName?: string, fromCodeLens?: boolean) {
     try {
-      const command = this.buildMinitestCommand(fileName, line, testName);
+      const command = this.buildMinitestCommand(fileName, line, testName, fromCodeLens);
       this.runTerminalCommand(command);
       this.presenter.setPending(fileName);
     } catch (error: any) {
@@ -54,13 +54,17 @@ export class MinitestRunner {
     await this.runTestForFile(filePath);
   }
 
-  private buildMinitestCommand(fileName: string, line?: number, testName?: string) {
+  private buildMinitestCommand(fileName: string, line?: number, testName?: string, fromCodeLens?: boolean) {
     const file = line ? [fileName, ':', line].join('') : fileName;
 
     const cdCommand = this.buildChangeDirectoryToWorkspaceRootCommand();
     const minitestCommand = [this.config.minitestCommand, quote(file)].join(' ');
 
-    const saveRunOptions = cmdJoin(`echo ${fileName} > ${this.outputFilePath}`, `echo ${line || 'ALL'} >> ${this.outputFilePath}`);
+    let lineNumber = line || 'ALL';
+    if (fromCodeLens) {
+      lineNumber = `${lineNumber} true`;
+    }
+    const saveRunOptions = cmdJoin(`echo ${fileName} > ${this.outputFilePath}`, `echo ${lineNumber} >> ${this.outputFilePath}`);
     const outputRedirect = `| ${teeCommand(this.outputFilePath, true, this.config.usingBashInWindows)}`;
     if (this.config.minitestDecorateEditorWithResults) {
       return cmdJoin(cdCommand, saveRunOptions, [minitestCommand, outputRedirect].join(' '));

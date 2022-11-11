@@ -1,8 +1,8 @@
 import * as vscode from 'vscode';
-import { CodeLensCommandArg } from './SpecRunnerCodeLensProvider';
 import SpecRunnerConfig from '../SpecRunnerConfig';
 import { cmdJoin, quote } from '../util';
 import SpecResultPresenter from '../SpecResultPresenter';
+import { RunRspecOrMinitestArg } from '../types';
 
 export class SpecRunner {
   private _term!: vscode.Terminal;
@@ -16,7 +16,7 @@ export class SpecRunner {
     this.presenter = presenter;
   }
 
-  async runSpec(arg?: CodeLensCommandArg) {
+  async runSpec(arg?: RunRspecOrMinitestArg) {
     if (this.config.saveBeforeRunning) {
       await vscode.commands.executeCommand('workbench.action.files.save');
     }
