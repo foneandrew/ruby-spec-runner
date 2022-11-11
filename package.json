@@ -14,10 +14,10 @@
 		"vscode": "^1.70.0"
 	},
 	"keywords": [
-    "ruby tests",
-    "rspec",
-    "minitest"
-  ],
+		"ruby tests",
+		"rspec",
+		"minitest"
+	],
 	"categories": [
 		"Other"
 	],
