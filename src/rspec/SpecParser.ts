@@ -6,7 +6,7 @@ interface SpecRegion {
 };
 
 export class SpecParser {
-  private matcher = /(?:^\s*(?:Rspec\.)?(?:describe|it|context)\s*(['"])(?<title>.*)\1\s*(?:do|{)$)|(?:^\s*(?:Rspec\.)?describe\s*(?<describe>[\w:\.]+))\s*(?:do|{$)|(?:^\s*it\s*{(?<singleLine>.*)}$)/;
+  private matcher = /(?:^\s*(?:Rspec\.)?(?:describe|it|context)\s*(?:(['"])(?<title>.*)\1)?\s*(?:,\s*[\w:'"]+\s*(?:=>)?\s*['":\w]+)?\s*(?:do|{)$)|(?:^\s*(?:Rspec\.)?describe\s*(?<describe>[\w:\.]+))\s*(?:do|{$)|(?:^\s*it\s*{(?<singleLine>.*)}$)|(?:^\s*it_behaves_like\s*(['"])(?:.*)\5$)/;
   private document: TextDocument;
 
   constructor(document: TextDocument) {
