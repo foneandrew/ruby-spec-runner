@@ -2,11 +2,17 @@
 
 All notable changes to the "spec-runner" extension will be documented in this file.
 
+## [3.1.0]
+
+- Restrict keyboard shortcuts to ruby files only
+- Add code lens support for more rspec line types
+
 ## [3.0.0]
 
 - **BREAKING** Removed `ruby-spec-runner.runSpec` & `ruby-spec-runner.runMinitest` commands as they were superfluous.
 - **BREAKING** Changed keyboard shortcut for running entire spec (now uses shift)
 - Add new command for running just the current line (uses the old shortcut)
+- Add code lens support for more rspec line types
 
 ## [2.2.1]
 

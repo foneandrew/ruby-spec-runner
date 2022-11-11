@@ -9,7 +9,7 @@
 	},
 	"icon": "images/icon.png",
 	"license": "MIT",
-	"version": "3.0.0",
+	"version": "3.1.0",
 	"engines": {
 		"vscode": "^1.70.0"
 	},
@@ -48,12 +48,14 @@
 			{
 				"command": "ruby-spec-runner.runRspecOrMinitestLine",
 				"key": "ctrl+alt+/",
-				"mac": "ctrl+cmd+/"
+				"mac": "ctrl+cmd+/",
+				"when": "editorLangId == 'ruby'"
 			},
 			{
 				"command": "ruby-spec-runner.runRspecOrMinitestFile",
 				"key": "ctrl+shift+alt+/",
-				"mac": "ctrl+shift+cmd+/"
+				"mac": "ctrl+shift+cmd+/",
+				"when": "editorLangId == 'ruby'"
 			}
 		],
 		"configuration": {
