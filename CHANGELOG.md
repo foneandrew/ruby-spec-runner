@@ -2,6 +2,12 @@
 
 All notable changes to the "spec-runner" extension will be documented in this file.
 
+## [3.0.0]
+
+- **BREAKING** Removed `ruby-spec-runner.runSpec` & `ruby-spec-runner.runMinitest` commands as they were superfluous.
+- **BREAKING** Changed keyboard shortcut for running entire spec (now uses shift)
+- Add new command for running just the current line (uses the old shortcut)
+
 ## [2.2.1]
 
 - When a file is changed the extension will try and be a bit smarter about how it figures out where the decorated lines have moved to. It's still using a dumb solution and will sometimes get it wrong, but hopefully less wrong than before.

@@ -9,7 +9,7 @@
 	},
 	"icon": "images/icon.png",
 	"license": "MIT",
-	"version": "2.2.1",
+	"version": "3.0.0",
 	"engines": {
 		"vscode": "^1.70.0"
 	},
@@ -32,16 +32,12 @@
 				"title": "Ruby Spec Runner: Run this spec/minitest file"
 			},
 			{
-				"command": "ruby-spec-runner.runSpec",
-				"title": "Ruby Spec Runner: Run this rspec spec"
+				"command": "ruby-spec-runner.runRspecOrMinitestLine",
+				"title": "Ruby Spec Runner: Run this line in rspec/minitest"
 			},
 			{
 				"command": "ruby-spec-runner.runFailedExamples",
 				"title": "Ruby Spec Runner: Re-run failed examples"
-			},
-			{
-				"command": "ruby-spec-runner.runMinitest",
-				"title": "Ruby Spec Runner: Run this minitest test"
 			},
 			{
 				"command": "ruby-spec-runner.clearResults",
@@ -50,9 +46,14 @@
 		],
 		"keybindings": [
 			{
-				"command": "ruby-spec-runner.runRspecOrMinitestFile",
+				"command": "ruby-spec-runner.runRspecOrMinitestLine",
 				"key": "ctrl+alt+/",
 				"mac": "ctrl+cmd+/"
+			},
+			{
+				"command": "ruby-spec-runner.runRspecOrMinitestFile",
+				"key": "ctrl+shift+alt+/",
+				"mac": "ctrl+shift+cmd+/"
 			}
 		],
 		"configuration": {

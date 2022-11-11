@@ -17,10 +17,9 @@ This extension is very heavily inspired by the [vscode-jest-runner](https://mark
 
 ## Extension Commands
 
-- **Ruby Spec Runner: Run this spec/minitest file** (`ruby-spec-runner.runRspecOrMinitestFile`): Run current minitest/rspec file. Shortcut: `Ctrl+Alt+/` (mac: `Ctrl+Cmd+/`)
+- **Ruby Spec Runner: Run this spec/minitest line** (`ruby-spec-runner.runRspecOrMinitestFile`): Run current line in minitest/rspec. Shortcut: `Ctrl+Alt+/` (mac: `Ctrl+Cmd+/`)
+- **Ruby Spec Runner: Run this spec/minitest file** (`ruby-spec-runner.runRspecOrMinitestFile`): Run whole current minitest/rspec file. Shortcut: `Ctrl+Shift+Alt+/` (mac: `Ctrl+Shift+Cmd+/`)
 - **Ruby Spec Runner: Clear test results for this file** (`ruby-spec-runner.clearResults`): Clear test results for the current file (sometimes the extension can get confused if edits are made while tests are running and this command can be used to clear up mistakes)
-- **Ruby Spec Runner: Run this rspec spec** (`ruby-spec-runner.runSpec`): Run tests for current rspec file
-- **Ruby Spec Runner: Run this minitest test** (`ruby-spec-runner.runMinitest`): Run tests for current minitest file
 - **Ruby Spec Runner: Re-run failed examples** (`ruby-spec-runner.runFailedExamples`): Re-run failed rspec tests
 
 ## Extension Settings

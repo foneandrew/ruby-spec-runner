@@ -2,12 +2,6 @@ import { CodeLens, CodeLensProvider, Event, ProviderResult, TextDocument } from 
 import MinitestParser from './MinitestParser';
 import SpecRunnerConfig from '../SpecRunnerConfig';
 
-export type CodeLensCommandArg = {
-  line: number;
-  fileName: string;
-  name?: string;
-};
-
 export class MinitestRunnerCodeLensProvider implements CodeLensProvider {
   onDidChangeCodeLenses?: Event<void> | undefined;
   private config: SpecRunnerConfig;
@@ -36,8 +30,8 @@ export class MinitestRunnerCodeLensProvider implements CodeLensProvider {
             name: testRegion.name,
             line: testRegion.range.start.line + 1
           }],
-          command: 'ruby-spec-runner.runMinitest',
-          tooltip: 'Run this test in minitest'
+          command: 'ruby-spec-runner.runRspecOrMinitestFile',
+          tooltip: 'Run this test'
         }
       ));
     });
