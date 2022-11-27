@@ -2,6 +2,10 @@
 
 All notable changes to the "spec-runner" extension will be documented in this file.
 
+## [3.1.1]
+
+- Fixed Run Spec / Run Minitest buttons that were relying on the commands removed in the previous release (－‸ლ)
+
 ## [3.1.0]
 
 - Restrict keyboard shortcuts to ruby files only

@@ -23,7 +23,7 @@ export class MinitestRunnerButton {
     }
 
     this.button.text = '$(testing-run-icon) Run test';
-    this.button.command = 'ruby-spec-runner.runMinitest';
+    this.button.command = 'ruby-spec-runner.runRspecOrMinitestFile';
     this.button.show();
   }
 }
