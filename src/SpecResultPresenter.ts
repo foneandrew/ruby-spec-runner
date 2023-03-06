@@ -210,7 +210,7 @@ export class SpecResultPresenter {
     linesToSync.forEach(([id, result, trimmedLineContent, newLineNumbers]) => {
       if (newLineNumbers.length > 0) {
         const newLine = this.selectNewLineNumber(newLineNumbers, result.line);
-        const testId = (newLine + 1).toString();
+        const testId = newLine.toString();
         this.testResults[currentFileName].results[testId.toString()] = result;
         this.testResults[currentFileName].results[testId.toString()].line = newLine;
       }
