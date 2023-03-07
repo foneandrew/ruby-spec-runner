@@ -2,6 +2,10 @@
 
 All notable changes to the "spec-runner" extension will be documented in this file.
 
+## [3.1.2]
+
+- Fixed issue with multiple results (current and stale results) showing up for a single line
+
 ## [3.1.1]
 
 - Fixed Run Spec / Run Minitest buttons that were relying on the commands removed in the previous release (－‸ლ)
