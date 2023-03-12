@@ -292,7 +292,7 @@ export class SpecResultPresenter {
     const currentTestRun = this.currentTestRun(activeEditor);
     const testRunPending = this.testResults[activeEditor.document.fileName].testRunPending;
 
-    const thing = Object.values(this.testResults[activeEditor.document.fileName]?.results || {})
+    const decorations = Object.values(this.testResults[activeEditor.document.fileName]?.results || {})
       .filter(result => {
         let filter =  options.forPendingTestRun === testRunPending;
 
@@ -312,7 +312,7 @@ export class SpecResultPresenter {
         range: new vscode.Range(result.line - 1, 0, result.line - 1, result.content.length),
         hoverMessage: typeof message === 'string' ? message : message(result.exception)
       }));
-    return thing;
+    return decorations;
   }
 
   private contentAtLine(file: vscode.TextDocument, line: number) {

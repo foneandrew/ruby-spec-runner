@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import SpecRunnerConfig from '../SpecRunnerConfig';
+import SpecRunnerConfig, { TerminalClear } from '../SpecRunnerConfig';
 import { cmdJoin, quote } from '../util';
 import SpecResultPresenter from '../SpecResultPresenter';
 import { RunRspecOrMinitestArg } from '../types';
@@ -79,7 +79,11 @@ export class SpecRunner {
 
   private async runTerminalCommand(command: string) {
     this.terminal.show();
-    await vscode.commands.executeCommand('workbench.action.terminal.clear');
+
+    if (this.config.clearTerminalOnTestRun === TerminalClear.Clear) {
+      await vscode.commands.executeCommand('workbench.action.terminal.clear');
+    }
+
     this.terminal.sendText(command);
   }
 

@@ -1,5 +1,12 @@
 import * as vscode from 'vscode';
 
+/* eslint-disable @typescript-eslint/naming-convention */
+export const enum TerminalClear {
+  None = 'none',
+  Clear = 'clear',
+}
+/* eslint-enable @typescript-eslint/naming-convention */
+
 export class SpecRunnerConfig {
   get rspecCommand(): string | undefined {
     const command = vscode.workspace.getConfiguration().get('ruby-spec-runner.rspecCommand') as string | undefined;
@@ -93,6 +100,18 @@ export class SpecRunnerConfig {
 
   get minitestDecorateEditorWithStaleResults(): boolean {
     return this.getBooleanConfig('ruby-spec-runner.minitestDecorateEditorWithStaleResults', true);
+  }
+
+  get clearTerminalOnTestRun() {
+    const format = vscode.workspace.getConfiguration().get('ruby-spec-runner.clearTerminalOnTestRun') as string | undefined;
+
+    switch (format) {
+      case 'Do not clear':
+        return TerminalClear.None;
+      case 'Clear':
+      default:
+        return TerminalClear.Clear;
+    };
   }
 
   private getBooleanConfig(key: string, defaultValue: boolean) {

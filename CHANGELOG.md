@@ -2,6 +2,10 @@
 
 All notable changes to the "spec-runner" extension will be documented in this file.
 
+## [3.2.0]
+
+- Add configuration for clearing the terminal before running test commands
+
 ## [3.1.2]
 
 - Fixed issue with multiple results (current and stale results) showing up for a single line
