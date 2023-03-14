@@ -2,6 +2,10 @@
 
 All notable changes to the "spec-runner" extension will be documented in this file.
 
+## [3.2.1]
+
+- Acknowledge that a pending test could be pending (previously the hover message only mentioned that the test was skipped)
+
 ## [3.2.0]
 
 - Add configuration for clearing the terminal before running test commands
