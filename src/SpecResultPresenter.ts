@@ -18,6 +18,32 @@ interface ConfigurableEditorDecorationsCollection {
   center: ConfigurableEditorDecorations;
 }
 
+interface BaseGetDecorationsParameters {
+  activeEditor: vscode.TextEditor;
+  options: {
+    forPendingTestRun: boolean;
+    state?: RspecExampleStatus;
+    forCurrentTestRun?: boolean;
+  }
+};
+
+interface GetDecorationsParametersWithMessage extends BaseGetDecorationsParameters {
+  message: string;
+  messageFromTestResult?: undefined;
+}
+
+interface GetDecorationsParametersWithMessageGenerator extends BaseGetDecorationsParameters {
+  message?: undefined;
+  messageFromTestResult: (testResult: TestResultLineResult) => string;
+}
+
+type GetDecorationsParameters = GetDecorationsParametersWithMessage | GetDecorationsParametersWithMessageGenerator;
+
+const hasMessage = (params: GetDecorationsParameters): params is GetDecorationsParametersWithMessage => {
+  // eslint-disable-next-line eqeqeq
+  return (params as GetDecorationsParametersWithMessage).message != null;
+};
+
 export class SpecResultPresenter {
   private _testResults!: TestResults;
   private config: SpecRunnerConfig;
@@ -104,69 +130,69 @@ export class SpecResultPresenter {
 
     activeEditor.setDecorations(this.failedLine, this.getFailedLineDecorations(activeEditor, false, error => `Test failed: ${error}`));
 
-    activeEditor.setDecorations(this.passedGutter, this.getDecorations(
+    activeEditor.setDecorations(this.passedGutter, this.getDecorations({
       activeEditor,
-      'Passed',
-      {
+      messageFromTestResult: testResult => ['Passed', testResult.runTime && `in ${testResult.runTime}`].filter(Boolean).join(' '),
+      options: {
         state: RspecExampleStatus.Passed,
         forCurrentTestRun: true,
         forPendingTestRun: false
       }
-    ));
-    activeEditor.setDecorations(this.pendingGutter, this.getDecorations(
+    }));
+    activeEditor.setDecorations(this.pendingGutter, this.getDecorations({
       activeEditor,
-      'Test is skipped/pending',
-      {
+      messageFromTestResult: testResult => ['Test is skipped/pending', testResult.pendingMessage].filter(Boolean).join(': '),
+      options: {
         state: RspecExampleStatus.Pending,
         forCurrentTestRun: true,
         forPendingTestRun: false
       }
-    ));
-    activeEditor.setDecorations(this.testRunPendingGutter, this.getDecorations(
+    }));
+    activeEditor.setDecorations(this.testRunPendingGutter, this.getDecorations({
       activeEditor,
-      'Awaiting test results...',
-      {
+      message: 'Awaiting test results...',
+      options: {
         forPendingTestRun: true
       }
-    ));
-    activeEditor.setDecorations(this.failedGutter, this.getDecorations(
+    }));
+    activeEditor.setDecorations(this.failedGutter, this.getDecorations({
       activeEditor,
-      exception => `Failed: ${exception?.message}`,
-      {
+      messageFromTestResult: testResult => ['Failed', testResult.runTime && ` in ${testResult.runTime}`, testResult?.exception?.message && `: ${testResult.exception.message}`].filter(Boolean).join(''),
+      options: {
         state: RspecExampleStatus.Failed,
         forCurrentTestRun: true,
         forPendingTestRun: false
       }
-    ));
+    }));
 
     if ((isSpecFile && this.config.rspecDecorateEditorWithStaleResults) || (isMinitestFile && this.config.minitestDecorateEditorWithStaleResults)) {
-      activeEditor.setDecorations(this.stalePassedGutter, this.getDecorations(
+      activeEditor.setDecorations(this.stalePassedGutter, this.getDecorations({
         activeEditor,
-        'Passed (stale)',
-        {
+        messageFromTestResult: testResult => ['Passed', testResult.runTime && `in ${testResult.runTime}`, '(stale)'].filter(Boolean).join(' '),
+        options: {
           state: RspecExampleStatus.Passed,
           forCurrentTestRun: false,
           forPendingTestRun: false
         }
-      ));
-      activeEditor.setDecorations(this.stalePendingGutter, this.getDecorations(
+      }));
+      activeEditor.setDecorations(this.stalePendingGutter, this.getDecorations({
         activeEditor,
-        'Test is skipped/pending (stale)',
-        {
+        messageFromTestResult: testResult => ['Test is skipped/pending', testResult.pendingMessage && `: ${testResult.pendingMessage}`, ' (stale)'].filter(Boolean).join(''),
+        options: {
           state: RspecExampleStatus.Pending,
           forCurrentTestRun: false,
           forPendingTestRun: false
         }
-      ));
-      activeEditor.setDecorations(this.staleFailedGutter, this.getDecorations(
+      }));
+      activeEditor.setDecorations(this.staleFailedGutter, this.getDecorations({
         activeEditor,
-        exception => `Failed (stale): ${exception?.message}`,
-        {
+        messageFromTestResult: testResult => ['Failed', testResult.runTime && ` in ${testResult.runTime}`, ' (stale)', testResult?.exception?.message && `: ${testResult.exception.message}`].filter(Boolean).join(''),
+        options: {
           state: RspecExampleStatus.Failed,
           forCurrentTestRun: false,
           forPendingTestRun: false
         }
-      ));
+      }));
       activeEditor.setDecorations(this.staleFailedLine, this.getFailedLineDecorations(activeEditor, true, error => `Test failed (stale): ${error}`));
     } else {
       this.clearGutters(activeEditor, true);
@@ -284,34 +310,39 @@ export class SpecResultPresenter {
       });
   }
 
-  private getDecorations(activeEditor: vscode.TextEditor, message: string | ((exception?: TestResultException) => string), options: {
-    forPendingTestRun: boolean;
-    state?: RspecExampleStatus;
-    forCurrentTestRun?: boolean;
-  }): vscode.DecorationOptions[] {
-    const currentTestRun = this.currentTestRun(activeEditor);
-    const testRunPending = this.testResults[activeEditor.document.fileName].testRunPending;
+  private getDecorations(params: GetDecorationsParameters): vscode.DecorationOptions[] {
+    const currentTestRun = this.currentTestRun(params.activeEditor);
+    const testRunPending = this.testResults[params.activeEditor.document.fileName].testRunPending;
 
-    const decorations = Object.values(this.testResults[activeEditor.document.fileName]?.results || {})
+    const decorations = Object.values(this.testResults[params.activeEditor.document.fileName]?.results || {})
       .filter(result => {
-        let filter =  options.forPendingTestRun === testRunPending;
+        let filter =  params.options.forPendingTestRun === testRunPending;
 
-        if (options.state) {
-          filter = filter && (result.status === options.state);
+        if (params.options.state) {
+          filter = filter && (result.status === params.options.state);
         }
 
         // eslint-disable-next-line eqeqeq
-        if (options.forCurrentTestRun != undefined) {
-          const isForDesiredTestRun = options.forCurrentTestRun ? (result.testRun === currentTestRun) : (result.testRun !== currentTestRun);
+        if (params.options.forCurrentTestRun != undefined) {
+          const isForDesiredTestRun = params.options.forCurrentTestRun ? (result.testRun === currentTestRun) : (result.testRun !== currentTestRun);
           filter = filter && isForDesiredTestRun;
         }
 
         return filter;
       })
-      .map(result => ({
-        range: new vscode.Range(result.line - 1, 0, result.line - 1, result.content.length),
-        hoverMessage: typeof message === 'string' ? message : message(result.exception)
-      }));
+      .map(result => {
+        let hoverMessage;
+        if (hasMessage(params)) {
+          hoverMessage = params.message;
+        } else {
+          hoverMessage = params.messageFromTestResult(result);
+        }
+
+        return {
+          range: new vscode.Range(result.line - 1, 0, result.line - 1, result.content.length),
+          hoverMessage
+        };
+      });
     return decorations;
   }
 
@@ -393,8 +424,8 @@ export class SpecResultPresenter {
     return decorations as ConfigurableEditorDecorationsCollection;
   }
 
-  private buildEditorDecoration(icon: string, color?: string, position?: vscode.OverviewRulerLane) {
-    return vscode.window.createTextEditorDecorationType({ gutterIconPath: path.join(__dirname, '..', 'resources', icon), overviewRulerColor: color, overviewRulerLane: position });
+  private buildEditorDecoration(icon: string, rulerColor?: string, position?: vscode.OverviewRulerLane) {
+    return vscode.window.createTextEditorDecorationType({ gutterIconPath: path.join(__dirname, '..', 'resources', icon), overviewRulerColor: rulerColor, overviewRulerLane: position });
   }
 }
 

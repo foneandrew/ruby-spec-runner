@@ -62,6 +62,9 @@ export interface TestResultLineResult {
   content: string;
   status: RspecExampleStatus;
   exception?: TestResultException;
+  testName?: string;
+  runTime?: string;
+  pendingMessage?: string;
 }
 
 export interface TestResults {

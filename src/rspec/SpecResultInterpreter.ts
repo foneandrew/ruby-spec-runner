@@ -53,7 +53,7 @@ export class SpecResultInterpreter {
     const testResults: TestResults = {};
 
     // eslint-disable-next-line @typescript-eslint/naming-convention
-    await Promise.all(examples.map(async ({ file_path, line_number, id, status, exception }) => {
+    await Promise.all(examples.map(async ({ file_path, line_number, id, status, exception, description, run_time, pending_message }) => {
       const absoluteFilePath = await this.testFilePath(file_path);
       const fileResults = testResults[absoluteFilePath] ||= {
         testRun,
@@ -71,7 +71,10 @@ export class SpecResultInterpreter {
         line: adjustedLine,
         content: this.contentAtLine(file, adjustedLine),
         status,
-        exception: this.exceptionContent(exception, file)
+        exception: this.exceptionContent(exception, file),
+        testName: description,
+        runTime: run_time ? `${run_time.toFixed(1)} seconds` : undefined,
+        pendingMessage: pending_message,
       };
     }));
 
