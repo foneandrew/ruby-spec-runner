@@ -63,17 +63,40 @@ export class SpecResultInterpreter {
 
       const file = vscode.workspace.textDocuments.find((doc) => doc.fileName === absoluteFilePath);
 
-      fileResults.results[line_number.toString()] = {
+      const adjustedLine = this.checkAndAdjustLine(line_number, description, file);
+
+      fileResults.results[adjustedLine.toString()] = {
         id,
         testRun,
-        line: line_number,
-        content: this.contentAtLine(file, line_number),
+        line: adjustedLine,
+        content: this.contentAtLine(file, adjustedLine),
         status,
         exception: this.exceptionContent(exception, file)
       };
     }));
 
     this.presenter.setTestResults(testResults);
+  }
+
+  /**
+   * The file may have been edited between the test starting and the test
+   * finishing, potentially moving the tests around. So we need to check
+   * if any lines need adjusting.
+   * Rspec gives us the test name so we can use that to find the line.
+   */
+  private checkAndAdjustLine(line: number, testName: string, file?: vscode.TextDocument) {
+    if (!file) { return line; }
+
+    const lineContent = this.contentAtLine(file, line);
+    if (lineContent.includes(testName)) { return line; }
+
+    const matchingLines = file.getText().split(/\r?\n/).map<[string, number]>((line, i) => [line, i]).filter(([line]) => line.includes(testName));
+    if (matchingLines.length === 0) { return line; } // Potentially generated title, fallback to original line
+    if (matchingLines.length === 1) {
+      return matchingLines[0][1] + 1;
+    }
+
+    return matchingLines.sort(([_lineA, lineANum], [_lineB, lineBNum]) => Math.abs(line - lineANum) > Math.abs(line - lineBNum) ? 1 : -1)[0][1];
   }
 
   private exceptionContent(exception?: RspecException, file?: vscode.TextDocument): TestResultException | undefined {
