@@ -2,6 +2,11 @@
 
 All notable changes to the "spec-runner" extension will be documented in this file.
 
+## [3.4.0]
+
+- Codelens support for running more types of examples
+- End of line comments shouldn't break codelens support
+
 ## [3.3.0]
 
 - Improvements for rspec:

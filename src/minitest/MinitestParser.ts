@@ -6,8 +6,7 @@ export interface MinitestRegion {
 };
 
 export class MinitestParser {
-  // private matcher = /(?:^\s*(?:describe|it|context|should)\s*(?<title>(['"]).*\2)\s*(?:do|{)$)|(?:^\s*describe\s*(?<describe>[\w\.]+))\s*(?:do|{$)|(?:^\s*def\s*(?<unit_def>test_\w+)\s*$)/;
-  private matcher = /(?:^\s*(?:it|should)\s*(?<title>(['"]).*\2)\s*(?:do|{)$)|(?:^\s*def\s*(?<unit_def>test_\w+)\s*$)/;
+  private matcher = /(?:(?:^\s*(?:it|should)\(?\s*(?<title>(['"]).*\2)\)?\s*(?:do|{))|(?:^\s*def\s*(?<unit_def>test_\w+)(?:\(\))?\s*))\s*(?:#.*)?$/;
   private document: TextDocument;
 
   constructor(document: TextDocument) {

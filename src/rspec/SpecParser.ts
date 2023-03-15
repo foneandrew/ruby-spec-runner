@@ -6,7 +6,7 @@ interface SpecRegion {
 };
 
 export class SpecParser {
-  private matcher = /(?:^\s*(?:Rspec\.)?(?:describe|it|context)\s*(?:(['"])(?<title>.*)\1)?\s*(?:,\s*[\w:'"]+\s*(?:=>)?\s*['":\w]+)?\s*(?:do|{)$)|(?:^\s*(?:Rspec\.)?describe\s*(?<describe>[\w:\.]+))\s*(?:do|{$)|(?:^\s*it\s*{(?<singleLine>.*)}$)|(?:^\s*it_behaves_like|include_examples\s*(['"])(?:.*)\5$)/;
+  private matcher = /(?:(?:^\s*(?:RSpec\.)?(?:it|context|example)\(?\s*(?:(['"])(?<title>.*)\1)?\)?\s*(?:,\s*[\w:'"]+\s*(?:=>)?\s*['":\w]+)?\s*(?:do|{))|(?:^\s*(?:it_behaves_like|include_examples)\s*(['"])(?:.*)\3\s*(?:do|{)?)|(?:^\s*(?:RSpec\.)?describe\(?\s*(?:(?<describedClass>[\w:\.]+)|(?:(['"])(?<describedString>.*)\5))\)?\s*(?:,\s*:?['"\w]+\s*(?:=>|:)\s*['"\w:]+\s*)*\s*(?:do|{))|(?:^\s*(?:it|example)\s*{(?<singleLine>.*)}))\s*(?:#.*)?$/;
   private document: TextDocument;
 
   constructor(document: TextDocument) {
