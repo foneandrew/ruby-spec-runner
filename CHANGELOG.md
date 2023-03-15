@@ -2,6 +2,12 @@
 
 All notable changes to the "spec-runner" extension will be documented in this file.
 
+## [3.3.0]
+
+- Improvements for rspec:
+  - Include test run time in the hover messages for test results
+  - Attempt to put test results in the right place if the file was edited between starting the test and the test finishing
+
 ## [3.2.1]
 
 - Acknowledge that a pending test could be pending (previously the hover message only mentioned that the test was skipped)

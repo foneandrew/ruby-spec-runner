@@ -12,7 +12,7 @@ This extension is very heavily inspired by the [vscode-jest-runner](https://mark
 - A "run spec" button in the status bar to quickly run the test file
 - `Ctrl+Alt+/` (mac: `Ctrl+Cmd+/`) will also run tests for the current file
 - Tests are run inside a terminal in vscode
-- Decorates the editor with the test results
+- Decorates the editor with the test results (hover over a marked line for more info)
 - Supports Rspec (and minitest to a lesser extent)
 
 ## Extension Commands
@@ -50,7 +50,7 @@ This extension contributes the following settings:
 - I don't have access to a windows machine so I can only hope that it works there.
 - Minitest support can be a bit janky as the default output isn't ideal for parsing
   - The extension can get confused when an error occurs in a setup block
-- Editing a test file while tests are running may result in editor decorations appearing in the incorrect location
+  - Editing a test file while tests are running may result in editor decorations appearing in the incorrect location
 
 ## Release Notes
 
