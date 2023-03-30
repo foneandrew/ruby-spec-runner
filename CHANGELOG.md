@@ -2,6 +2,10 @@
 
 All notable changes to the "spec-runner" extension will be documented in this file.
 
+## [3.5.0]
+
+- Add support for capybara's `scenario`, `specify`, and `feature` (thanks [steveclarke](https://github.com/steveclarke))
+
 ## [3.4.0]
 
 - Codelens support for running more types of examples
