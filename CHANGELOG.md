@@ -2,6 +2,10 @@
 
 All notable changes to the "spec-runner" extension will be documented in this file.
 
+## [3.5.1]
+
+- Add missing code lens support for `Rspec.describe Class::Name, "string" do` syntax (thanks [steveclarke](https://github.com/steveclarke))
+
 ## [3.5.0]
 
 - Add support for capybara's `scenario`, `specify`, and `feature` (thanks [steveclarke](https://github.com/steveclarke))
