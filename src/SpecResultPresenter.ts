@@ -210,17 +210,24 @@ export class SpecResultPresenter {
     // [id, result, trimmedLineContent, newLineNumbers[]]
     let linesToSync: [string, TestResultLineResult, string, number[]][] = [];
     const currentFileName = activeEditor.document.fileName;
-    const fileResults = this.testResults[activeEditor.document.fileName];
+    const fileResults = this.testResults[currentFileName];
 
     // Find and remove lines that have been added or removed
     Object.entries(fileResults?.results || {}).forEach(([id, result]) => {
       const content = this.contentAtLine(activeEditor.document, result.line);
-
-      if(!content.startsWith(result.content)) {
+      if (result.content == null) {
+        // If content is empty, then this should be the first time the file is opened
+        // and therefore lines should be in sync from the test run.
+        result.content = content;
+      } else if (!content.startsWith(result.content)) {
         linesToSync.push([id, result, result.content.trim(), []]);
         delete this.testResults[currentFileName].results[id];
       }
     });
+
+    if (linesToSync.length === 0) {
+      return;
+    }
 
     // Find new matching lines
     const lines = activeEditor.document.getText().split(/\r?\n/);
@@ -339,7 +346,7 @@ export class SpecResultPresenter {
         }
 
         return {
-          range: new vscode.Range(result.line - 1, 0, result.line - 1, result.content.length),
+          range: new vscode.Range(result.line - 1, 0, result.line - 1, result.content?.length || 100),
           hoverMessage
         };
       });

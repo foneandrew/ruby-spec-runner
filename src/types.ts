@@ -59,7 +59,7 @@ export interface TestResultLineResult {
   id: string; // Test id
   testRun: string;
   line: number;
-  content: string;
+  content?: string;
   status: RspecExampleStatus;
   exception?: TestResultException;
   testName?: string;

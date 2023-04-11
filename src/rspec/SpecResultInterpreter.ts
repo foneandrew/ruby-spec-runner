@@ -91,7 +91,7 @@ export class SpecResultInterpreter {
     if (!file) { return line; }
 
     const lineContent = this.contentAtLine(file, line);
-    if (lineContent.includes(testName)) { return line; }
+    if (lineContent?.includes(testName)) { return line; }
 
     const matchingLines = file.getText().split(/\r?\n/).map<[string, number]>((line, i) => [line, i]).filter(([line]) => line.includes(testName));
     if (matchingLines.length === 0) { return line; } // Potentially generated title, fallback to original line
@@ -125,7 +125,7 @@ export class SpecResultInterpreter {
   private contentAtLine(file: vscode.TextDocument | undefined, line: number) {
     // If we can't access the file we will set the content to the current time
     // which effectively means the content is unknown.
-    return file?.getText(new vscode.Range(line - 1, 0, line - 1, 1000)) || Date.now().toString();
+    return file?.getText(new vscode.Range(line - 1, 0, line - 1, 1000));
   }
 
   private async testFilePath(maybeARelativeFilePath: string) {
