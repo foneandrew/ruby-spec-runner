@@ -42,6 +42,10 @@
 			{
 				"command": "ruby-spec-runner.clearResults",
 				"title": "Ruby Spec Runner: Clear test results for this file"
+			},
+			{
+				"command": "ruby-spec-runner.runAllExamples",
+				"title": "Ruby Spec Runner: Run all examples"
 			}
 		],
 		"keybindings": [

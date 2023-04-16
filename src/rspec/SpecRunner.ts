@@ -36,6 +36,10 @@ export class SpecRunner {
     this.runCurrentSpec(true);
   }
 
+  async runAllExamples() {
+    console.log("running all specs");
+  }
+
   async runSpecForFile(fileName: string, failedOnly:boolean, line?: number, testName?: string) {
     try {
       const command = this.buildRspecCommand(fileName, failedOnly, line, testName);
