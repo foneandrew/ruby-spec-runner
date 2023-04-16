@@ -1,11 +1,11 @@
-import { RspecOutput } from "./types";
+import { RspecOutput } from './types';
 
 export function isWindows(): boolean {
   return process.platform.includes('win32');
 }
 
 export function quote(s: string): string {
-  const q = isWindows() ? '"' : `'`;
+  const q = isWindows() ? '"' : "'";
   return [q, s, q].join('');
 }
 
