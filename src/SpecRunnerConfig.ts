@@ -8,12 +8,12 @@ export const enum TerminalClear {
 /* eslint-enable @typescript-eslint/naming-convention */
 
 export class SpecRunnerConfig {
-  get rspecCommand(): string | undefined {
+  get rspecCommand(): string {
     const command = vscode.workspace.getConfiguration().get('ruby-spec-runner.rspecCommand') as string | undefined;
     return command?.trim() || 'bundle exec rspec';
   }
 
-  get minitestCommand(): string | undefined {
+  get minitestCommand(): string {
     const command = vscode.workspace.getConfiguration().get('ruby-spec-runner.minitestCommand') as string | undefined;
     return command?.trim() || 'bundle exec rails t';
   }

@@ -30,8 +30,8 @@ const expectedCodeLensLocations = [
 	52
 ];
 
-suite('SpecParser', () => {
-	test('Identifies all the places to put code lens prompts', async () => {
+describe('SpecParser', () => {
+	it('Identifies all the places to put code lens prompts', async () => {
 		// Add all the examples to test for in the test file referenced by testFileLocation
 		const uri = vscode.Uri.file(
       path.join(__dirname + testFileLocation)
