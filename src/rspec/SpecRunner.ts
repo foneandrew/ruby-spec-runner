@@ -69,7 +69,7 @@ export class SpecRunner {
     const jsonOutput = this.config.rspecDecorateEditorWithResults ? `-f j --out ${quote(this.outputFilePath)}` : '';
 
     const cdCommand = this.buildChangeDirectoryToWorkspaceRootCommand();
-    const rspecCommand = [this.config.rspecCommand, failedOnlyModifier, format, jsonOutput, quote(file)].join(' ');
+    const rspecCommand = [this.config.rspecEnv, this.config.rspecCommand, failedOnlyModifier, format, jsonOutput, quote(file)].filter(Boolean).join(' ');
     return cmdJoin(cdCommand, rspecCommand);
   }
 

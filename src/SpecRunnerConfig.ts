@@ -13,9 +13,19 @@ export class SpecRunnerConfig {
     return command?.trim() || 'bundle exec rspec';
   }
 
+  get rspecEnv(): string {
+    const env = vscode.workspace.getConfiguration().get('ruby-spec-runner.rspecEnv') as string | undefined;
+    return env?.trim() || '';
+  }
+
   get minitestCommand(): string {
     const command = vscode.workspace.getConfiguration().get('ruby-spec-runner.minitestCommand') as string | undefined;
     return command?.trim() || 'bundle exec rails t';
+  }
+
+  get minitestEnv(): string {
+    const env = vscode.workspace.getConfiguration().get('ruby-spec-runner.minitestEnv') as string | undefined;
+    return env?.trim() || '';
   }
 
   get changeDirectoryToWorkspaceRoot(): boolean {

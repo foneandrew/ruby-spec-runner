@@ -28,7 +28,9 @@ This extension is very heavily inspired by the [vscode-jest-runner](https://mark
 This extension contributes the following settings:
 
 - `ruby-spec-runner.rspecCommand`: Override the rspec command
+- `ruby-spec-runner.rspecEnv`: Pass env vars to the rspec command
 - `ruby-spec-runner.minitestCommand`: Override the minitest command
+- `ruby-spec-runner.minitestEnv`: Pass env vars to the minitest command
 - `ruby-spec-runner.changeDirectoryToWorkspaceRoot`: When true the test command will cd to workspace root first
 - `ruby-spec-runner.projectPath`: Override the root project path
 - `ruby-spec-runner.rspecFormat`: Configure rspec's terminal output format

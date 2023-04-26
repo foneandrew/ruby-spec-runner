@@ -64,13 +64,25 @@
 				"ruby-spec-runner.rspecCommand": {
 					"type": "string",
 					"default": "",
-					"markdownDescription": "Rspec: Provide an alternative rspec command. For example you may need to use a different path to rspec.\n\nCan also be used to disable code coverage by passing env vars. Example: `SKIP_COVERAGE=true bundle exec rspec`.",
+					"markdownDescription": "Rspec: Provide an alternative rspec command. For example you may need to use a different path to rspec.",
+					"scope": "window"
+				},
+				"ruby-spec-runner.rspecEnv": {
+					"type": "string",
+					"default": "",
+					"markdownDescription": "Rspec: Provide an environment variables for rspec command. For example you may to disable code coverage with something like `SKIP_COVERAGE=true`.",
 					"scope": "window"
 				},
 				"ruby-spec-runner.minitestCommand": {
 					"type": "string",
 					"default": "",
-					"markdownDescription": "Minitest: Provide an alternative minitest command. For example you may need to use a different path to minitest.\n\nCan also be used to disable code coverage by passing env vars. Example: `SKIP_COVERAGE=true bundle exec rails t`.",
+					"markdownDescription": "Minitest: Provide an alternative minitest command. For example you may need to use a different path to minitest.",
+					"scope": "window"
+				},
+				"ruby-spec-runner.minitestEnv": {
+					"type": "string",
+					"default": "",
+					"markdownDescription": "Minitest: Provide an environment variables for minitest command. For example you may to disable code coverage with something like `SKIP_COVERAGE=true`.",
 					"scope": "window"
 				},
 				"ruby-spec-runner.changeDirectoryToWorkspaceRoot": {

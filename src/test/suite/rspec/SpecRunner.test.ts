@@ -32,6 +32,7 @@ describe('SpecRunner', () => {
     rspecFormat: 'p',
     saveBeforeRunning: true,
     clearTerminalOnTestRun: TerminalClear.Clear,
+    rspecDecorateEditorWithResults: true,
   } as SpecRunnerConfig;
   const sendTextFake = sandbox.fake();
   const showTerminalFake = sandbox.fake();
@@ -74,7 +75,8 @@ describe('SpecRunner', () => {
       assert(createTerminalSpy.calledWith('SpecRunner' as any));
       assert(showTerminalFake.called);
       assert(executeCommandSpy.calledWith('workbench.action.terminal.clear'));
-      assert(sendTextFake.calledWith("cd 'current-workspace-root' && bundle exec rspec  -f p  '/Users/andy/dev/spec-runner/src/test/examples/example_spec.rb'"));
+      assert(sendTextFake.called);
+      assert(sendTextFake.getCalls()[0].args[0].match(new RegExp(`^cd 'current-workspace-root' && bundle exec rspec -f p -f j --out '/tmp/test-output.json' '.*${testFileLocation}'$`)));
       assert(presenterFake.setPending.called);
       assert(presenterFake.setPending.getCalls()[0].args[0].endsWith(testFileLocation));
     });
@@ -95,7 +97,30 @@ describe('SpecRunner', () => {
       assert(showTerminalFake.called);
       assert(executeCommandSpy.calledWith('workbench.action.terminal.clear'));
       assert(sendTextFake.called);
-      assert(sendTextFake.getCalls()[0].args[0].match(new RegExp(`^cd 'current-workspace-root' && bundle exec rspec  -f p  '.*${testFileLocation}:2'$`)));
+      assert(sendTextFake.getCalls()[0].args[0].match(new RegExp(`^cd 'current-workspace-root' && bundle exec rspec -f p -f j --out '/tmp/test-output.json' '.*${testFileLocation}:2'$`)));
+      assert(presenterFake.setPending.called);
+      assert(presenterFake.setPending.getCalls()[0].args[0].endsWith(testFileLocation));
+    });
+  });
+
+  describe('With rspecEnv set', () => {
+    it('Includes the the env vars', async () => {
+      // Add all the examples to test for in the test file referenced by buildRelativeTestFileLocation
+      const fileLocation = path.join(__dirname + buildRelativeTestFileLocation);
+      const uri = vscode.Uri.file(fileLocation);
+      await vscode.workspace.openTextDocument(uri);
+      const presenterFake = createFakePresenter(sandbox);
+
+      const specRunner = new SpecRunner({ ...defaultConfig, rspecEnv: 'TEST=true' } as SpecRunnerConfig, '/tmp/test-output.json', presenterFake);
+      await specRunner.runSpec({ line: 2, fileName: fileLocation });
+      await sleep(500);
+
+      assert(executeCommandSpy.calledWith('workbench.action.files.save'));
+      assert(createTerminalSpy.calledWith('SpecRunner' as any));
+      assert(showTerminalFake.called);
+      assert(executeCommandSpy.calledWith('workbench.action.terminal.clear'));
+      assert(sendTextFake.called);
+      assert(sendTextFake.getCalls()[0].args[0].match(new RegExp(`^cd 'current-workspace-root' && TEST=true bundle exec rspec -f p -f j --out '/tmp/test-output.json' '.*${testFileLocation}:2'$`)));
       assert(presenterFake.setPending.called);
       assert(presenterFake.setPending.getCalls()[0].args[0].endsWith(testFileLocation));
     });
@@ -118,7 +143,7 @@ describe('SpecRunner', () => {
       assert(showTerminalFake.called);
       assert(executeCommandSpy.calledWith('workbench.action.terminal.clear'));
       assert(sendTextFake.called);
-      assert(sendTextFake.getCalls()[0].args[0].match(new RegExp(`^bundle exec rspec  -f p  '.*${testFileLocation}:2'$`)));
+      assert(sendTextFake.getCalls()[0].args[0].match(new RegExp(`^bundle exec rspec -f p -f j --out '/tmp/test-output.json' '.*${testFileLocation}:2'$`)));
       assert(presenterFake.setPending.called);
       assert(presenterFake.setPending.getCalls()[0].args[0].endsWith(testFileLocation));
     });
@@ -141,7 +166,7 @@ describe('SpecRunner', () => {
       assert(showTerminalFake.called);
       assert(executeCommandSpy.calledWith('workbench.action.terminal.clear'));
       assert(sendTextFake.called);
-      assert(sendTextFake.getCalls()[0].args[0].match(new RegExp(`^cd 'current-workspace-root' && bundle exec rspec  -f d  '.*${testFileLocation}:2'$`)));
+      assert(sendTextFake.getCalls()[0].args[0].match(new RegExp(`^cd 'current-workspace-root' && bundle exec rspec -f d -f j --out '/tmp/test-output.json' '.*${testFileLocation}:2'$`)));
       assert(presenterFake.setPending.called);
       assert(presenterFake.setPending.getCalls()[0].args[0].endsWith(testFileLocation));
     });
@@ -164,7 +189,7 @@ describe('SpecRunner', () => {
       assert(showTerminalFake.called);
       assert(executeCommandSpy.calledWith('workbench.action.terminal.clear'));
       assert(sendTextFake.called);
-      assert(sendTextFake.getCalls()[0].args[0].match(new RegExp(`^cd 'current-workspace-root' && bundle exec rspec  -f p  '.*${testFileLocation}:2'$`)));
+      assert(sendTextFake.getCalls()[0].args[0].match(new RegExp(`^cd 'current-workspace-root' && bundle exec rspec -f p -f j --out '/tmp/test-output.json' '.*${testFileLocation}:2'$`)));
       assert(presenterFake.setPending.called);
       assert(presenterFake.setPending.getCalls()[0].args[0].endsWith(testFileLocation));
     });
@@ -187,10 +212,32 @@ describe('SpecRunner', () => {
       assert(showTerminalFake.called);
       assert(!executeCommandSpy.calledWith('workbench.action.terminal.clear'));
       assert(sendTextFake.called);
-      assert(sendTextFake.getCalls()[0].args[0].match(new RegExp(`^cd 'current-workspace-root' && bundle exec rspec  -f p  '.*${testFileLocation}:2'$`)));
+      assert(sendTextFake.getCalls()[0].args[0].match(new RegExp(`^cd 'current-workspace-root' && bundle exec rspec -f p -f j --out '/tmp/test-output.json' '.*${testFileLocation}:2'$`)));
       assert(presenterFake.setPending.called);
       assert(presenterFake.setPending.getCalls()[0].args[0].endsWith(testFileLocation));
     });
   });
 
+  describe('When rspecDecorateEditorWithResults is false', () => {
+    it('Does not include the json output option', async () => {
+      // Add all the examples to test for in the test file referenced by buildRelativeTestFileLocation
+      const fileLocation = path.join(__dirname + buildRelativeTestFileLocation);
+      const uri = vscode.Uri.file(fileLocation);
+      await vscode.workspace.openTextDocument(uri);
+      const presenterFake = createFakePresenter(sandbox);
+
+      const specRunner = new SpecRunner({ ...defaultConfig, rspecDecorateEditorWithResults: false } as SpecRunnerConfig, '/tmp/test-output.json', presenterFake);
+      await specRunner.runSpec({ line: 2, fileName: fileLocation });
+      await sleep(500);
+
+      assert(executeCommandSpy.calledWith('workbench.action.files.save'));
+      assert(createTerminalSpy.calledWith('SpecRunner' as any));
+      assert(showTerminalFake.called);
+      assert(executeCommandSpy.calledWith('workbench.action.terminal.clear'));
+      assert(sendTextFake.called);
+      assert(sendTextFake.getCalls()[0].args[0].match(new RegExp(`^cd 'current-workspace-root' && bundle exec rspec -f p '.*${testFileLocation}:2'$`)));
+      assert(presenterFake.setPending.called);
+      assert(presenterFake.setPending.getCalls()[0].args[0].endsWith(testFileLocation));
+    });
+  });
 });

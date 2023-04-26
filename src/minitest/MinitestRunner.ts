@@ -58,7 +58,7 @@ export class MinitestRunner {
     const file = line ? [fileName, ':', line].join('') : fileName;
 
     const cdCommand = this.buildChangeDirectoryToWorkspaceRootCommand();
-    const minitestCommand = [this.config.minitestCommand, quote(file)].join(' ');
+    const minitestCommand = [this.config.minitestEnv, this.config.minitestCommand, quote(file)].filter(Boolean).join(' ');
 
     let lineNumber = line || 'ALL';
     if (fromCodeLens) {
@@ -67,7 +67,7 @@ export class MinitestRunner {
     const saveRunOptions = cmdJoin(`echo ${fileName} > ${this.outputFilePath}`, `echo ${lineNumber} >> ${this.outputFilePath}`);
     const outputRedirect = `| ${teeCommand(this.outputFilePath, true, this.config.usingBashInWindows)}`;
     if (this.config.minitestDecorateEditorWithResults) {
-      return cmdJoin(cdCommand, saveRunOptions, [minitestCommand, outputRedirect].join(' '));
+      return cmdJoin(cdCommand, saveRunOptions, [minitestCommand, outputRedirect].filter(Boolean).join(' '));
     }
 
     return cmdJoin(cdCommand, minitestCommand);
