@@ -137,6 +137,12 @@
 					"description": "Rspec: Show a status bar button to run the current spec file",
 					"scope": "window"
 				},
+				"ruby-spec-runner.rspecDebugButton": {
+					"type": "boolean",
+					"default": true,
+					"description": "Rspec: Show a status bar button to debug the current spec file",
+					"scope": "window"
+				},
 				"ruby-spec-runner.rspecRunAllFailedButton": {
 					"type": "boolean",
 					"default": false,

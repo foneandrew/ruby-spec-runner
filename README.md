@@ -49,6 +49,7 @@ This extension contributes the following settings:
 - `ruby-spec-runner.rspecFormat`: Configure rspec's terminal output format
 - `ruby-spec-runner.saveBeforeRunning`: When true the test file is saved before it is run
 - `ruby-spec-runner.rspecRunButton`: Show a run button in the status bar
+- `ruby-spec-runner.rspecDebugButton`: Show a debug button in the status bar
 - `ruby-spec-runner.rspecRunAllFailedButton`: Show a button to re-run failed tests in the status bar (disabled by default)
 - `ruby-spec-runner.minitestRunButton`: Show a run button in the status bar
 - `ruby-spec-runner.rspecCodeLensPrompts`: Show prompts in the editor to run an rspec test

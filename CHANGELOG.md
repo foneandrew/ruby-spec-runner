@@ -9,6 +9,7 @@ All notable changes to the "spec-runner" extension will be documented in this fi
 - Add configuration for env vars `ruby-spec-runner.rspecEnv`. Having env vars separate from the command allows us to pass them through to rbdg
 - Add configuration for showing debug code lens prompts in editor for rspec files `ruby-spec-runner.rspecCodeLensDebugPrompts`
 - Add configuration for which ruby debugger to use `ruby-spec-runner.rubyDebugger`
+- Add configuration for showing a debug button in the status bar `ruby-spec-runner.rspecDebugButton`
 - Add command for debugging rspec file `ruby-spec-runner.debugRspecFile`
 - Add command for debugging current rspec line `ruby-spec-runner.debugRspecLine`
 
