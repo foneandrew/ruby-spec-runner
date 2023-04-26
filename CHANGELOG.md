@@ -2,6 +2,16 @@
 
 All notable changes to the "spec-runner" extension will be documented in this file.
 
+## [3.6.0]
+
+- Add support for debugging via rdbg or ruby-lsp vscode extensions
+  - Only working for rspec unfortunately
+- Add configuration for env vars `ruby-spec-runner.rspecEnv`. Having env vars separate from the command allows us to pass them through to rbdg
+- Add configuration for showing debug code lens prompts in editor for rspec files `ruby-spec-runner.rspecCodeLensDebugPrompts`
+- Add configuration for which ruby debugger to use `ruby-spec-runner.rubyDebugger`
+- Add command for debugging rspec file `ruby-spec-runner.debugRspecFile`
+- Add command for debugging current rspec line `ruby-spec-runner.debugRspecLine`
+
 ## [3.5.1]
 
 - Add missing code lens support for `Rspec.describe Class::Name, "string" do` syntax (thanks [steveclarke](https://github.com/steveclarke))
