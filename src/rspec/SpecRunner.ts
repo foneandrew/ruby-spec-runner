@@ -1,8 +1,8 @@
 import * as vscode from 'vscode';
 import SpecRunnerConfig, { TerminalClear } from '../SpecRunnerConfig';
-import { cmdJoin, quote } from '../util';
+import { cmdJoin, quote, stringifyEnvs } from '../util';
 import SpecResultPresenter from '../SpecResultPresenter';
-import { RunRspecOrMinitestArg } from '../types';
+import { RubyDebugger, RunRspecOrMinitestArg } from '../types';
 
 export class SpecRunner {
   private _term!: vscode.Terminal;
@@ -22,9 +22,9 @@ export class SpecRunner {
     }
 
     if (arg?.fileName) {
-      this.runSpecForFile(arg.fileName, false, arg.line, arg.name);
+      this.runSpecForFile(arg.fileName, false, arg.line, arg.name, arg.debugging);
     } else {
-      this.runCurrentSpec();
+      this.runCurrentSpec(false, arg?.debugging);
     }
   }
 
@@ -36,10 +36,18 @@ export class SpecRunner {
     this.runCurrentSpec(true);
   }
 
-  async runSpecForFile(fileName: string, failedOnly:boolean, line?: number, testName?: string) {
+  async runSpecForFile(fileName: string, failedOnly: boolean, line?: number, testName?: string, debugging?: boolean) {
     try {
-      const command = this.buildRspecCommand(fileName, failedOnly, line, testName);
-      this.runTerminalCommand(command);
+      if (debugging) {
+        const debugConfig = this.buildRspecDebugConfig(fileName, failedOnly, this.config.rubyDebugger, line, testName);
+        if (debugConfig) {
+          vscode.debug.startDebugging(undefined, debugConfig);
+        }
+      } else {
+        const command = this.buildRspecCommand(fileName, failedOnly, line, testName);
+        this.runTerminalCommand(command);
+      }
+
       this.presenter.setPending(fileName);
     } catch (error: any) {
       if (error?.name === 'NoWorkspaceError') {
@@ -51,7 +59,7 @@ export class SpecRunner {
     }
   }
 
-  async runCurrentSpec(failedOnly=false) {
+  async runCurrentSpec(failedOnly=false, debugging?: boolean) {
     const filePath = vscode.window.activeTextEditor?.document.fileName;
     if (!filePath) {
       console.error('SpecRunner: Unable to run spec as no editor is open.');
@@ -59,7 +67,48 @@ export class SpecRunner {
       return;
     }
 
-    await this.runSpecForFile(filePath, failedOnly);
+    await this.runSpecForFile(filePath, failedOnly, undefined, undefined, debugging);
+  }
+
+  private buildRspecDebugConfig(fileName: string, failedOnly: boolean,  rubyDebugger: RubyDebugger, line?: number, testName?: string): vscode.DebugConfiguration | undefined {
+    switch (rubyDebugger) {
+      case (RubyDebugger.Rdbg): {
+        return {
+          type: 'rdbg',
+          name: 'SpecRdbgDebugger',
+          request: 'launch',
+          command: this.config.rspecCommand,
+          script: quote(line ? [fileName, ':', line].join('') : fileName),
+          env: this.config.rspecEnv,
+          args: [
+            `-f ${this.config.rspecFormat}`,
+            this.config.rspecDecorateEditorWithResults ? `-f j --out ${quote(this.outputFilePath)}` : undefined
+          ].filter(Boolean),
+          askParameters: false,
+          useTerminal: true, // Not using terminal seems to make rdbg stick a './` in front of the absolute path of the file (╯°□°)╯︵ ┻━┻
+          cwd: this.config.changeDirectoryToWorkspaceRoot ? this.config.projectPath : undefined
+        };
+      }
+      case (RubyDebugger.RubyLSP): {
+        return {
+          type: 'ruby_lsp',
+          name: 'SpecRubyLSPDebugger',
+          request: 'launch',
+          program: [
+            this.config.rspecCommand,
+            `-f ${this.config.rspecFormat}`,
+            this.config.rspecDecorateEditorWithResults ? `-f j --out ${quote(this.outputFilePath)}` : undefined,
+            quote(line ? [fileName, ':', line].join('') : fileName)
+          ].filter(Boolean).join(' '),
+          env: this.config.rspecEnv,
+          cwd: this.config.changeDirectoryToWorkspaceRoot ? this.config.projectPath : undefined
+        };
+      }
+      default: {
+        console.error('SpecRunner: Unable to generate debug config. Unknown configured debugger option: ', rubyDebugger);
+        vscode.window.showErrorMessage(`SpecRunner: Unable to debug spec. Unknown configured debugger option: ${rubyDebugger}`);
+      }
+    }
   }
 
   private buildRspecCommand(fileName: string, failedOnly: boolean, line?: number, testName?: string) {
@@ -69,7 +118,7 @@ export class SpecRunner {
     const jsonOutput = this.config.rspecDecorateEditorWithResults ? `-f j --out ${quote(this.outputFilePath)}` : '';
 
     const cdCommand = this.buildChangeDirectoryToWorkspaceRootCommand();
-    const rspecCommand = [this.config.rspecEnv, this.config.rspecCommand, failedOnlyModifier, format, jsonOutput, quote(file)].filter(Boolean).join(' ');
+    const rspecCommand = [stringifyEnvs(this.config.rspecEnv), this.config.rspecCommand, failedOnlyModifier, format, jsonOutput, quote(file)].filter(Boolean).join(' ');
     return cmdJoin(cdCommand, rspecCommand);
   }
 

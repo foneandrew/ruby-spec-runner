@@ -24,3 +24,7 @@ export function cmdJoin(...args: string[]): string {
 export function isRspecOutput(output: any): output is RspecOutput {
   return !!output?.version && !!output?.examples && !!output?.summary?.duration;
 }
+
+export function stringifyEnvs(envs: {[key: string]: any}): string {
+  return Object.keys(envs).map((key) => `${key}=${envs[key]}`).join(' ');
+}

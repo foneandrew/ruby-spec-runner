@@ -12,7 +12,7 @@ export class SpecRunnerCodeLensProvider implements CodeLensProvider {
   }
 
   provideCodeLenses(document: TextDocument): ProviderResult<CodeLens[]> {
-    if (!this.config.rspecCodeLensPrompts) {
+    if (!this.config.rspecCodeLensPrompts && !this.config.rspecCodeLensDebugPrompts) {
       return [];
     }
 
@@ -28,15 +28,28 @@ export class SpecRunnerCodeLensProvider implements CodeLensProvider {
         line: specRegion.range.start.line + 1,
         fromCodeLens: true
       };
-      codeLens.push(new CodeLens(
-        specRegion.range,
-        {
-          title: '$(testing-run-icon) Run',
-          arguments: [args],
-          command: 'ruby-spec-runner.runRspecOrMinitestFile',
-          tooltip: 'Run this example/context'
-        }
-      ));
+      if (this.config.rspecCodeLensPrompts) {
+
+        codeLens.push(
+          new CodeLens(specRegion.range, {
+            title: '$(testing-run-icon) Run',
+            arguments: [args],
+            command: 'ruby-spec-runner.runRspecOrMinitestFile',
+            tooltip: 'Run this example/context'
+          })
+        );
+      }
+      if (this.config.rspecCodeLensDebugPrompts) {
+
+        codeLens.push(
+          new CodeLens(specRegion.range, {
+            title: '$(testing-debug-icon) Debug',
+            arguments: [args],
+            command: 'ruby-spec-runner.debugRspecFile',
+            tooltip: 'Debug this example/context',
+          })
+        );
+      }
     });
 
     return codeLens;

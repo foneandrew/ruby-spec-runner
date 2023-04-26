@@ -12,12 +12,28 @@ export interface RspecException {
   backtrace: string[];
 }
 
-export type RunRspecOrMinitestArg = {
-  line: number;
-  fileName: string;
+export enum RubyDebugger {
+  Rdbg = 'rdbg',
+  RubyLSP = 'ruby_lsp'
+}
+
+interface RunRspecOrMinitestArgBase {
   name?: string;
   fromCodeLens?: boolean;
-};
+  debugging?: boolean;
+}
+
+interface RunRspecOrMinitestArgForLine extends RunRspecOrMinitestArgBase {
+  line: number;
+  fileName: string;
+}
+
+interface RunRspecOrMinitestArgForCurrentFile extends RunRspecOrMinitestArgBase {
+  line?: undefined;
+  fileName?: undefined;
+}
+
+export type RunRspecOrMinitestArg = RunRspecOrMinitestArgForLine | RunRspecOrMinitestArgForCurrentFile;
 
 type RspecExample = {
   id: string; // "./spec/unit/models/account_event_spec.rb[1:3:1]"

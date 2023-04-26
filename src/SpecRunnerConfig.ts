@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import { RubyDebugger } from './types';
 
 /* eslint-disable @typescript-eslint/naming-convention */
 export const enum TerminalClear {
@@ -13,9 +14,9 @@ export class SpecRunnerConfig {
     return command?.trim() || 'bundle exec rspec';
   }
 
-  get rspecEnv(): string {
-    const env = vscode.workspace.getConfiguration().get('ruby-spec-runner.rspecEnv') as string | undefined;
-    return env?.trim() || '';
+  get rspecEnv(): object {
+    const env = vscode.workspace.getConfiguration().get('ruby-spec-runner.rspecEnv') as object | undefined;
+    return env || {};
   }
 
   get minitestCommand(): string {
@@ -23,9 +24,9 @@ export class SpecRunnerConfig {
     return command?.trim() || 'bundle exec rails t';
   }
 
-  get minitestEnv(): string {
-    const env = vscode.workspace.getConfiguration().get('ruby-spec-runner.minitestEnv') as string | undefined;
-    return env?.trim() || '';
+  get minitestEnv(): object {
+    const env = vscode.workspace.getConfiguration().get('ruby-spec-runner.minitestEnv') as object | undefined;
+    return env || {};
   }
 
   get changeDirectoryToWorkspaceRoot(): boolean {
@@ -92,6 +93,10 @@ export class SpecRunnerConfig {
     return this.getBooleanConfig('ruby-spec-runner.rspecCodeLensPrompts', true);
   }
 
+  get rspecCodeLensDebugPrompts(): boolean {
+    return this.getBooleanConfig('ruby-spec-runner.rspecCodeLensDebugPrompts', true);
+  }
+
   get minitestCodeLensPrompts(): boolean {
     return this.getBooleanConfig('ruby-spec-runner.minitestCodeLensPrompts', true);
   }
@@ -121,6 +126,17 @@ export class SpecRunnerConfig {
       case 'Clear':
       default:
         return TerminalClear.Clear;
+    };
+  }
+
+  get rubyDebugger(): RubyDebugger {
+    const format = vscode.workspace.getConfiguration().get('ruby-spec-runner.rubyDebugger') as string | undefined;
+
+    switch (format) {
+      case 'Ruby LSP':
+        return RubyDebugger.RubyLSP;
+      default:
+        return RubyDebugger.Rdbg;
     };
   }
 

@@ -36,6 +36,14 @@
 				"title": "Ruby Spec Runner: Run this line in rspec/minitest"
 			},
 			{
+				"command": "ruby-spec-runner.debugRspecFile",
+				"title": "Ruby Spec Runner: Debug this spec file"
+			},
+			{
+				"command": "ruby-spec-runner.debugRspecLine",
+				"title": "Ruby Spec Runner: Debug this line in rspec"
+			},
+			{
 				"command": "ruby-spec-runner.runFailedExamples",
 				"title": "Ruby Spec Runner: Re-run failed examples"
 			},
@@ -56,6 +64,18 @@
 				"key": "ctrl+shift+alt+/",
 				"mac": "ctrl+shift+cmd+/",
 				"when": "editorLangId == 'ruby'"
+			},
+			{
+				"command": "ruby-spec-runner.debugRspecLine",
+				"key": "ctrl+k ctrl+alt+/",
+				"mac": "cmd+k ctrl+cmd+/",
+				"when": "editorLangId == 'ruby'"
+			},
+			{
+				"command": "ruby-spec-runner.debugRspecFile",
+				"key": "ctrl+k ctrl+shift+alt+/",
+				"mac": "cmd+k ctrl+shift+cmd+/",
+				"when": "editorLangId == 'ruby'"
 			}
 		],
 		"configuration": {
@@ -63,14 +83,12 @@
 			"properties": {
 				"ruby-spec-runner.rspecCommand": {
 					"type": "string",
-					"default": "",
 					"markdownDescription": "Rspec: Provide an alternative rspec command. For example you may need to use a different path to rspec.",
 					"scope": "window"
 				},
 				"ruby-spec-runner.rspecEnv": {
-					"type": "string",
-					"default": "",
-					"markdownDescription": "Rspec: Provide an environment variables for rspec command. For example you may to disable code coverage with something like `SKIP_COVERAGE=true`.",
+					"type": "object",
+					"markdownDescription": "Rspec: Provide an environment variables for rspec command. For example you may to disable code coverage with something like `{\"SKIP_COVERAGE\": true}`.",
 					"scope": "window"
 				},
 				"ruby-spec-runner.minitestCommand": {
@@ -80,9 +98,9 @@
 					"scope": "window"
 				},
 				"ruby-spec-runner.minitestEnv": {
-					"type": "string",
+					"type": "object",
 					"default": "",
-					"markdownDescription": "Minitest: Provide an environment variables for minitest command. For example you may to disable code coverage with something like `SKIP_COVERAGE=true`.",
+					"markdownDescription": "Minitest: Provide an environment variables for minitest command. For example you may to disable code coverage with something like `{\"SKIP_COVERAGE\": true}`.",
 					"scope": "window"
 				},
 				"ruby-spec-runner.changeDirectoryToWorkspaceRoot": {
@@ -135,6 +153,12 @@
 					"type": "boolean",
 					"default": true,
 					"description": "Rspec: Show code lens prompts to run specific examples or contexts in the editor",
+					"scope": "window"
+				},
+				"ruby-spec-runner.rspecCodeLensDebugPrompts": {
+					"type": "boolean",
+					"default": true,
+					"description": "Rspec: Show code lens prompts to debug specific examples or contexts in the editor",
 					"scope": "window"
 				},
 				"ruby-spec-runner.minitestCodeLensPrompts": {
@@ -196,6 +220,16 @@
 					],
 					"default": "Clear",
 					"markdownDescription": "Before a test command is executed the previous terminal output can be cleared. \n\n- **Clear:** Clear the terminal output\n- **Do not clear:** Do not clear the terminal output (allow scrollback)",
+					"scope": "window"
+				},
+				"ruby-spec-runner.rubyDebugger": {
+					"type": "string",
+					"enum": [
+						"Rdbg",
+						"Ruby LSP"
+					],
+					"default": "Rdbg",
+					"markdownDescription": "Which ruby debugger to use\n\n* **Rdbg:** The [ruby debug vscode extension](https://marketplace.visualstudio.com/items?itemName=KoichiSasada.vscode-rdbg)\n* **RubyLSP:** The [ruby-lsp vscode extension](https://marketplace.visualstudio.com/items?itemName=Shopify.ruby-lsp)",
 					"scope": "window"
 				}
 			}

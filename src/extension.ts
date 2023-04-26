@@ -6,6 +6,46 @@ import { MinitestRunner, MinitestRunnerCodeLensProvider, MinitestRunnerButton, M
 import { SpecRunner, SpecRunnerCodeLensProvider, FailedSpecRunnerButton, SpecRunnerButton } from './rspec';
 import { RunRspecOrMinitestArg } from './types';
 
+const buildFileRunnerHandler = (minitestRunner: MinitestRunner, specRunner: SpecRunner, debugging: boolean) => async (args: any) => {
+  const filePath = vscode.window.activeTextEditor?.document.fileName;
+  if (!filePath) {
+    console.error('SpecRunner: Unable to run spec / minitest file as no editor is open.');
+    vscode.window.showErrorMessage('SpecRunner: Unable to run spec / minitest file. It appears that no editor is open.');
+    return;
+  }
+
+  if (filePath.match(/_test\.rb$/)) {
+    if (debugging) return; // Minitest debugging does not seem to work :(
+    minitestRunner.runTest({ ...args, debugging });
+  } else {
+    specRunner.runSpec({ ...args, debugging });
+  }
+};
+
+const buildLineRunnerHandler = (minitestRunner: MinitestRunner, specRunner: SpecRunner, debugging: boolean) => async () => {
+  const filePath = vscode.window.activeTextEditor?.document.fileName;
+  const line = vscode.window.activeTextEditor?.selection.active.line;
+  // eslint-disable-next-line eqeqeq
+  if (!filePath || line == null) {
+    console.error('SpecRunner: Unable to run spec / minitest file as no editor is open.');
+    vscode.window.showErrorMessage('SpecRunner: Unable to run spec / minitest file. It appears that no editor is open.');
+    return;
+  }
+
+  const args: RunRspecOrMinitestArg = {
+    fileName: filePath,
+    line: line + 1,
+    debugging
+  };
+
+  if (filePath.match(/_test\.rb$/)) {
+    if (debugging) return; // Minitest debugging does not seem to work :(
+    minitestRunner.runTest(args);
+  } else {
+    specRunner.runSpec(args);
+  }
+};
+
 // This method is called when the extension is activated
 export function activate(context: vscode.ExtensionContext) {
   console.log('Extension "spec-runner" is now active!');
@@ -20,45 +60,20 @@ export function activate(context: vscode.ExtensionContext) {
 
   const runRspecOrMinitestFile = vscode.commands.registerCommand(
     'ruby-spec-runner.runRspecOrMinitestFile',
-    async (...args) => {
-      const filePath = vscode.window.activeTextEditor?.document.fileName;
-      if (!filePath) {
-        console.error('SpecRunner: Unable to run spec / minitest file as no editor is open.');
-        vscode.window.showErrorMessage('SpecRunner: Unable to run spec / minitest file. It appears that no editor is open.');
-        return;
-      }
-
-      if (filePath.match(/_test\.rb$/)) {
-        minitestRunner.runTest(...args);
-      } else {
-        specRunner.runSpec(...args);
-      }
-    }
+    buildFileRunnerHandler(minitestRunner, specRunner, false)
+  );
+  const debugRspecFile = vscode.commands.registerCommand(
+    'ruby-spec-runner.debugRspecFile',
+    buildFileRunnerHandler(minitestRunner, specRunner, true)
   );
 
   const runRspecOrMinitestLine = vscode.commands.registerCommand(
     'ruby-spec-runner.runRspecOrMinitestLine',
-    async () => {
-      const filePath = vscode.window.activeTextEditor?.document.fileName;
-      const line = vscode.window.activeTextEditor?.selection.active.line;
-      // eslint-disable-next-line eqeqeq
-      if (!filePath || line == null) {
-        console.error('SpecRunner: Unable to run spec / minitest file as no editor is open.');
-        vscode.window.showErrorMessage('SpecRunner: Unable to run spec / minitest file. It appears that no editor is open.');
-        return;
-      }
-
-      const args: RunRspecOrMinitestArg = {
-        fileName: filePath,
-        line: line + 1,
-      };
-
-      if (filePath.match(/_test\.rb$/)) {
-        minitestRunner.runTest(args);
-      } else {
-        specRunner.runSpec(args);
-      }
-    }
+    buildLineRunnerHandler(minitestRunner, specRunner, false)
+  );
+  const debugRspecLine = vscode.commands.registerCommand(
+    'ruby-spec-runner.debugRspecLine',
+    buildLineRunnerHandler(minitestRunner, specRunner, true)
   );
   const runFailedExample = vscode.commands.registerCommand(
     'ruby-spec-runner.runFailedExamples',
@@ -86,7 +101,9 @@ export function activate(context: vscode.ExtensionContext) {
   const minitestRunnerButton = new MinitestRunnerButton(vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 2), config);
 
   context.subscriptions.push(runRspecOrMinitestFile);
+  context.subscriptions.push(debugRspecFile);
   context.subscriptions.push(runRspecOrMinitestLine);
+  context.subscriptions.push(debugRspecLine);
   context.subscriptions.push(clearResults);
   context.subscriptions.push(runFailedExample);
   context.subscriptions.push(specCodeLensProviderDisposable);
