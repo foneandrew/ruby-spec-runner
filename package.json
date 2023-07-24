@@ -9,7 +9,7 @@
 	},
 	"icon": "images/icon.png",
 	"license": "MIT",
-	"version": "3.6.0",
+	"version": "3.7.0",
 	"engines": {
 		"vscode": "^1.76.0"
 	},
@@ -91,6 +91,11 @@
 					"markdownDescription": "Rspec: Provide an environment variables for rspec command. For example you may to disable code coverage with something like `{\"SKIP_COVERAGE\": true}`.",
 					"scope": "window"
 				},
+				"ruby-spec-runner.rspecDebugEnv": {
+					"type": "object",
+					"markdownDescription": "Rspec: Provide additional environment variables for rspec command when debugging. For example you may to disable a spring preloader (which doesn't work with debugging) with something like `{\"DISABLE_SPRING\": true}`.\n\nEnvironment variables set here will be merged with those set in `rspecEnv` with `rspecDebugEnv` variables given preference.",
+					"scope": "window"
+				},
 				"ruby-spec-runner.minitestCommand": {
 					"type": "string",
 					"default": "",
@@ -99,7 +104,6 @@
 				},
 				"ruby-spec-runner.minitestEnv": {
 					"type": "object",
-					"default": "",
 					"markdownDescription": "Minitest: Provide an environment variables for minitest command. For example you may to disable code coverage with something like `{\"SKIP_COVERAGE\": true}`.",
 					"scope": "window"
 				},

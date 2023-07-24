@@ -42,6 +42,7 @@ This extension contributes the following settings:
 
 - `ruby-spec-runner.rspecCommand`: Override the rspec command
 - `ruby-spec-runner.rspecEnv`: Pass env vars to the rspec command
+- `ruby-spec-runner.rspecDebugEnv`: Additional env vars to the rspec command when debugging. Merges into and overrides env vars set via "rspecEnv"
 - `ruby-spec-runner.minitestCommand`: Override the minitest command
 - `ruby-spec-runner.minitestEnv`: Pass env vars to the minitest command
 - `ruby-spec-runner.changeDirectoryToWorkspaceRoot`: When true the test command will cd to workspace root first

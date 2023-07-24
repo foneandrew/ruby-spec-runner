@@ -19,6 +19,11 @@ export class SpecRunnerConfig {
     return env || {};
   }
 
+  get rspecDebugEnv(): object {
+    const env = vscode.workspace.getConfiguration().get('ruby-spec-runner.rspecDebugEnv') as object | undefined;
+    return env || {};
+  }
+
   get minitestCommand(): string {
     const command = vscode.workspace.getConfiguration().get('ruby-spec-runner.minitestCommand') as string | undefined;
     return command?.trim() || 'bundle exec rails t';

@@ -2,6 +2,10 @@
 
 All notable changes to the "spec-runner" extension will be documented in this file.
 
+## [3.7.0]
+
+- Introduce configuration `ruby-spec-runner.rspecDebugEnv` for additional env var config for test debugging. This way things like spring can be disabled (which don't work with vscode debugging).
+
 ## [3.6.0]
 
 - Add support for debugging via rdbg or ruby-lsp vscode extensions

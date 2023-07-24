@@ -79,7 +79,7 @@ export class SpecRunner {
           request: 'launch',
           command: this.config.rspecCommand,
           script: quote(line ? [fileName, ':', line].join('') : fileName),
-          env: this.config.rspecEnv,
+          env: {...this.config.rspecEnv, ...this.config.rspecDebugEnv},
           args: [
             `-f ${this.config.rspecFormat}`,
             this.config.rspecDecorateEditorWithResults ? `-f j --out ${quote(this.outputFilePath)}` : undefined
