@@ -73,6 +73,7 @@ export class MinitestRunner {
       // For a single test line
       testFile = [fileName, ':', line].join('');
     }
+    const minitestArgs = [quote(testFile), testNameFilter].filter(Boolean).join(' -- ');
 
 
     switch (rubyDebugger) {
@@ -82,7 +83,7 @@ export class MinitestRunner {
           name: 'MinitestRdbgDebugger',
           request: 'launch',
           command: this.config.minitestCommand,
-          script: [quote(testFile), testNameFilter].filter(Boolean).join(' '),
+          script: minitestArgs,
           env: this.config.minitestEnv,
           askParameters: false,
           useTerminal: true,
@@ -94,7 +95,7 @@ export class MinitestRunner {
           type: 'ruby_lsp',
           name: 'MinitestRubyLSPDebugger',
           request: 'launch',
-          program: [this.config.minitestCommand, quote(testFile), testNameFilter].filter(Boolean).join(' '),
+          program: [this.config.minitestCommand, minitestArgs].filter(Boolean).join(' '),
           env: this.config.minitestEnv,
           cwd: this.config.changeDirectoryToWorkspaceRoot ? this.config.projectPath : undefined
         };
@@ -119,15 +120,16 @@ export class MinitestRunner {
       // For a single test line
       testFile = [fileName, ':', line].join('');
     }
+    const minitestArgs = [quote(testFile), testNameFilter].filter(Boolean).join(' -- ');
 
     const cdCommand = this.buildChangeDirectoryToWorkspaceRootCommand();
-    const minitestCommand = [stringifyEnvs(this.config.minitestEnv), this.config.minitestCommand, quote(testFile)].filter(Boolean).join(' ');
+    const minitestCommand = [stringifyEnvs(this.config.minitestEnv), this.config.minitestCommand, minitestArgs].filter(Boolean).join(' ');
 
     const lineNumber = JSON.stringify(lines) || 'ALL';
     const saveRunOptions = cmdJoin(`echo ${fileName} > ${this.outputFilePath}`, `echo ${quote(lineNumber)} >> ${this.outputFilePath}`);
     const outputRedirect = `| ${teeCommand(this.outputFilePath, true, this.config.usingBashInWindows)}`;
     if (this.config.minitestDecorateEditorWithResults) {
-      return cmdJoin(cdCommand, saveRunOptions, [minitestCommand, testNameFilter, outputRedirect].filter(Boolean).join(' '));
+      return cmdJoin(cdCommand, saveRunOptions, [minitestCommand, outputRedirect].filter(Boolean).join(' '));
     }
 
     return cmdJoin(cdCommand, minitestCommand);

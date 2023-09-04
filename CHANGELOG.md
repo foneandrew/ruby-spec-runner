@@ -2,6 +2,10 @@
 
 All notable changes to the "spec-runner" extension will be documented in this file.
 
+## [3.8.1]
+
+- Pass `--` to minitest when using the `-n` option.
+
 ## [3.8.0]
 
 - Support contexts for minitest files by using the context with the `-n` flag. In order to parse successful results for contexts we need to figure out what test cases are inside it. To do this we are relying on regex shenanigans to do with indentation within the context and matching lines that look like tests. So it will probably fall apart for test files with formatting that the extension does not expect.
