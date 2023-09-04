@@ -1,6 +1,6 @@
 # Ruby spec runner
 
-Run ruby rspec and minitests from vscode.
+Run ruby rspec specs and minitest tests from vscode.
 
 This extension is very heavily inspired by the [vscode-jest-runner](https://marketplace.visualstudio.com/items?itemName=firsttris.vscode-jest-runner) and [ruby-test-runner](https://marketplace.visualstudio.com/items?itemName=MateuszDrewniak.ruby-test-runner) extensions. ruby-test-runner didn't quite meet my needs to I decided to try and build my own version. `¯\_(ツ)_/¯`
 
@@ -68,9 +68,11 @@ This extension contributes the following settings:
 ## Known Issues
 
 - I don't have access to a windows machine so I can only hope that it works there.
-- Minitest support is a bit janky as the default output isn't ideal for parsing
+- Minitest support is janky as the default output isn't ideal for parsing, and there is limited support for running tests via line numbers. We are relying heavily on regex shenanigans to match results with lines in the test file.
   - The extension can get confused when an error occurs outside of the test example (setup blocks, helper methods etc). When this happens the test could be marked as passing when it actually failed.
   - Editing a test file while tests are running can result in editor decorations appearing in the incorrect location
+  - Running all tests in a context can be a bit hit and miss.
+  - As minitest does not support running tests for line numbers outside of a test example, the "Run this spec/minitest line" command will search for and run the test or context found at or above the currently selected line
   - Debugging minitest files is currently unsupported cause I can't get it working :(
 
 ## Release Notes
