@@ -17,11 +17,12 @@ export class MinitestRunnerCodeLensProvider implements CodeLensProvider {
     }
 
     const parser = new MinitestParser(document);
-    const specRegions = parser.getTestRegions();
+    const testRegions = parser.getTestRegions();
+    const contextRegions = parser.getContextRegions();
 
     const codeLens: CodeLens[] = [];
 
-    specRegions.forEach(testRegion => {
+    testRegions.forEach(testRegion => {
       const args: RunRspecOrMinitestArg = {
         fileName: document.fileName,
         name: testRegion.name,
@@ -30,6 +31,25 @@ export class MinitestRunnerCodeLensProvider implements CodeLensProvider {
       };
       codeLens.push(new CodeLens(
         testRegion.range,
+        {
+          title: '$(testing-run-icon) Run',
+          arguments: [args],
+          command: 'ruby-spec-runner.runRspecOrMinitestFile',
+          tooltip: 'Run this test'
+        }
+      ));
+    });
+
+    contextRegions.forEach(contextRegion => {
+      const args: RunRspecOrMinitestArg = {
+        fileName: document.fileName,
+        name: contextRegion.name,
+        line: contextRegion.range.start.line + 1,
+        fromCodeLens: true,
+        forLines: contextRegion.forTestLines?.map(line => line + 1)
+      };
+      codeLens.push(new CodeLens(
+        contextRegion.range,
         {
           title: '$(testing-run-icon) Run',
           arguments: [args],

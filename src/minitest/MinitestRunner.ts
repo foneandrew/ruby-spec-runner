@@ -22,21 +22,21 @@ export class MinitestRunner {
     }
 
     if (arg?.fileName) {
-      this.runTestForFile(arg.fileName, arg.line, arg.name, arg.fromCodeLens, arg.debugging);
+      this.runTestForFile(arg.fileName, arg.line, arg.name, arg.fromCodeLens, arg.debugging, arg.forLines);
     } else {
       this.runCurrentTest(arg?.debugging);
     }
   }
 
-  async runTestForFile(fileName: string, line?: number, testName?: string, fromCodeLens?: boolean, debugging?: boolean) {
+  async runTestForFile(fileName: string, line?: number, testName?: string, fromCodeLens?: boolean, debugging?: boolean, forLines?: number[]) {
     try {
       if (debugging) {
-        const debugConfig = this.buildMinitestDebugConfig(fileName, this.config.rubyDebugger, line, testName, fromCodeLens);
+        const debugConfig = this.buildMinitestDebugConfig(fileName, this.config.rubyDebugger, line, testName, fromCodeLens, forLines);
         if (debugConfig) {
           vscode.debug.startDebugging(undefined, debugConfig);
         }
       } else {
-        const command = this.buildMinitestCommand(fileName, line, testName, fromCodeLens);
+        const command = this.buildMinitestCommand(fileName, line, testName, fromCodeLens, forLines);
         this.runTerminalCommand(command);
       }
       this.presenter.setPending(fileName);
@@ -61,8 +61,19 @@ export class MinitestRunner {
     await this.runTestForFile(filePath, undefined, undefined, undefined, debugging);
   }
 
-  private buildMinitestDebugConfig(fileName: string, rubyDebugger: RubyDebugger, line?: number, testName?: string, fromCodeLens?: boolean) {
-    const file = line ? [fileName, ':', line].join('') : fileName;
+  private buildMinitestDebugConfig(fileName: string, rubyDebugger: RubyDebugger, line?: number, testName?: string, fromCodeLens?: boolean, forLines?: number[]) {
+    let testFile = fileName;
+    let testNameFilter;
+
+    if (testName && forLines?.length) {
+      // For a context
+      testNameFilter = `-n ${this.testNameFilterRegex(testName)}`;
+    // eslint-disable-next-line eqeqeq
+    } else if (line != null) {
+      // For a single test line
+      testFile = [fileName, ':', line].join('');
+    }
+
 
     switch (rubyDebugger) {
       case (RubyDebugger.Rdbg): {
@@ -71,7 +82,7 @@ export class MinitestRunner {
           name: 'MinitestRdbgDebugger',
           request: 'launch',
           command: this.config.minitestCommand,
-          script: quote(file),
+          script: [quote(testFile), testNameFilter].filter(Boolean).join(' '),
           env: this.config.minitestEnv,
           askParameters: false,
           useTerminal: true,
@@ -83,7 +94,7 @@ export class MinitestRunner {
           type: 'ruby_lsp',
           name: 'MinitestRubyLSPDebugger',
           request: 'launch',
-          program: [this.config.minitestCommand, quote(file)].join(' '),
+          program: [this.config.minitestCommand, quote(testFile), testNameFilter].filter(Boolean).join(' '),
           env: this.config.minitestEnv,
           cwd: this.config.changeDirectoryToWorkspaceRoot ? this.config.projectPath : undefined
         };
@@ -95,20 +106,31 @@ export class MinitestRunner {
     }
   }
 
-  private buildMinitestCommand(fileName: string, line?: number, testName?: string, fromCodeLens?: boolean) {
-    const file = line ? [fileName, ':', line].join('') : fileName;
+  private buildMinitestCommand(fileName: string, line?: number, testName?: string, fromCodeLens?: boolean, forLines?: number[]) {
+    let lines = [line];
+    let testFile = fileName;
+    let testNameFilter;
+
+    if (testName && forLines?.length) {
+      // For a context
+      lines = forLines;
+      testNameFilter = `-n ${this.testNameFilterRegex(testName)}`;
+    } else if (lines.length === 1) {
+      // For a single test line
+      testFile = [fileName, ':', line].join('');
+    }
 
     const cdCommand = this.buildChangeDirectoryToWorkspaceRootCommand();
-    const minitestCommand = [stringifyEnvs(this.config.minitestEnv), this.config.minitestCommand, quote(file)].filter(Boolean).join(' ');
+    const minitestCommand = [stringifyEnvs(this.config.minitestEnv), this.config.minitestCommand, quote(testFile)].filter(Boolean).join(' ');
 
-    let lineNumber = line || 'ALL';
+    let lineNumber = JSON.stringify(lines) || 'ALL';
     if (fromCodeLens) {
       lineNumber = `${lineNumber} true`;
     }
-    const saveRunOptions = cmdJoin(`echo ${fileName} > ${this.outputFilePath}`, `echo ${lineNumber} >> ${this.outputFilePath}`);
+    const saveRunOptions = cmdJoin(`echo ${fileName} > ${this.outputFilePath}`, `echo ${quote(lineNumber)} >> ${this.outputFilePath}`);
     const outputRedirect = `| ${teeCommand(this.outputFilePath, true, this.config.usingBashInWindows)}`;
     if (this.config.minitestDecorateEditorWithResults) {
-      return cmdJoin(cdCommand, saveRunOptions, [minitestCommand, outputRedirect].filter(Boolean).join(' '));
+      return cmdJoin(cdCommand, saveRunOptions, [minitestCommand, testNameFilter, outputRedirect].filter(Boolean).join(' '));
     }
 
     return cmdJoin(cdCommand, minitestCommand);
@@ -134,6 +156,10 @@ export class MinitestRunner {
     }
 
     return this._term;
+  }
+
+  private testNameFilterRegex(s: string): string {
+    return `"/${s.replace(/(?<!\\)"/g, '\\"')}/"`;
   }
 };
 

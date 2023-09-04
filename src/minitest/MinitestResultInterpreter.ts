@@ -56,13 +56,15 @@ export class MinitestResultInterpreter {
       return;
     }
 
-    const match = line.match(/^(?<lineNumber>\d+)\s?(?<fromCodeLens>true)?$/);
-    let testRunLineNumber = match?.groups?.lineNumber ? parseInt(match?.groups?.lineNumber) : undefined;
+    const match = line.match(/^(?<lineNumbers>\[[\d,]+\])\s?(?<fromCodeLens>true)?$/);
+    let testRunLineNumbers: number[] = match?.groups?.lineNumbers ? JSON.parse(match?.groups?.lineNumbers) : undefined;
+    let testRunLineNumber = testRunLineNumbers?.length === 1 ? testRunLineNumbers[0] : undefined;
     const fromCodeLens = match?.groups?.fromCodeLens;
 
     const strippedOutput = minitestOutput.replace(this.colorCodesMatcher, '');
-    const regions = new MinitestParser(file).getTestRegions();
-    const reversedTestLines = regions.map(r => r.range.start.line + 1).reverse();
+    const parser = new MinitestParser(file);
+    const testRegions = parser.getTestRegions();
+    const reversedTestLines = testRegions.map(r => r.range.start.line + 1).reverse();
 
     // eslint-disable-next-line eqeqeq
     if (testRunLineNumber != null && !fromCodeLens) {
@@ -95,13 +97,14 @@ export class MinitestResultInterpreter {
     }
 
     let seenLines: number[] = [];
-    seenLines = seenLines.concat(this.failureMatches(strippedOutput, regions, file, testRun, fileResults, testRunLineNumber));
-    seenLines = seenLines.concat(this.errorMatches(strippedOutput, regions, file, testRun, fileResults, testRunLineNumber));
-    seenLines = seenLines.concat(this.skippedMatches(strippedOutput, regions, file, testRun, fileResults, testRunLineNumber));
+    seenLines = seenLines.concat(this.failureMatches(strippedOutput, testRegions, file, testRun, fileResults, testRunLineNumber));
+    seenLines = seenLines.concat(this.errorMatches(strippedOutput, testRegions, file, testRun, fileResults, testRunLineNumber));
+    seenLines = seenLines.concat(this.skippedMatches(strippedOutput, testRegions, file, testRun, fileResults, testRunLineNumber));
 
-    if (line === 'ALL') {
+    if (line === 'ALL' || testRunLineNumbers?.length > 1) {
       // Find the tests that didn't fail, error or skip (they must have passed)
-      reversedTestLines.filter(line => !seenLines.includes(line)).forEach(line => {
+      const linesIncludedInTestRun = line === 'ALL' ? reversedTestLines : testRunLineNumbers;
+      linesIncludedInTestRun.filter(line => !seenLines.includes(line)).forEach(line => {
         fileResults.results[line.toString()] = {
           id: '¯\\_(ツ)_/¯',
           testRun,

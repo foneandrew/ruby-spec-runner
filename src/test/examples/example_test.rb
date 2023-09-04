@@ -20,13 +20,15 @@ module MyModule
       assert_equal 2, 1 + 1
     end
 
-    context "contexts don't actually work..." do
+    context "contexts work now!" do
       it('can handle brackets') do
         assert_equal 2, 1 + 1
       end
 
-      it("can use curlies") {
-        assert_equal 2, 1 + 1
+      context('Nested ones too!') {
+        it("can use curlies") {
+          assert_equal 2, 1 + 1
+        }
       }
 
       def test_that_it_handles_functions
@@ -34,6 +36,18 @@ module MyModule
       end
 
       def test_that_it_handles_functions_with_brackets()
+        assert_equal 2, 1 + 1
+      end
+    end
+  end
+
+  class SomeContext < MyTest
+    should 'work with subclasses as contexts' do
+      assert_equal 2, 1 + 1
+    end
+
+    describe "#whatever" do # comments are OK
+      should "work with subclasses as contexts #2" do
         assert_equal 2, 1 + 1
       end
     end

@@ -15,7 +15,7 @@ const buildFileRunnerHandler = (minitestRunner: MinitestRunner, specRunner: Spec
   }
 
   if (filePath.match(/_test\.rb$/)) {
-    if (debugging) return; // Minitest debugging does not seem to work :(
+    if (debugging) { return; } // Minitest debugging does not seem to work :(
     minitestRunner.runTest({ ...args, debugging });
   } else {
     specRunner.runSpec({ ...args, debugging });
@@ -39,7 +39,7 @@ const buildLineRunnerHandler = (minitestRunner: MinitestRunner, specRunner: Spec
   };
 
   if (filePath.match(/_test\.rb$/)) {
-    if (debugging) return; // Minitest debugging does not seem to work :(
+    if (debugging) { return; } // Minitest debugging does not seem to work :(
     minitestRunner.runTest(args);
   } else {
     specRunner.runSpec(args);

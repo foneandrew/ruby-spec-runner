@@ -21,6 +21,7 @@ interface RunRspecOrMinitestArgBase {
   name?: string;
   fromCodeLens?: boolean;
   debugging?: boolean;
+  forLines?: number[];
 }
 
 interface RunRspecOrMinitestArgForLine extends RunRspecOrMinitestArgBase {
