@@ -19,7 +19,6 @@ export enum RubyDebugger {
 
 interface RunRspecOrMinitestArgBase {
   name?: string;
-  fromCodeLens?: boolean;
   debugging?: boolean;
   forLines?: number[];
 }

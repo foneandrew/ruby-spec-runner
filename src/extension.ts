@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import { SpecRunnerConfig } from './SpecRunnerConfig';
 import SpecResultInterpreter from './rspec/SpecResultInterpreter';
 import SpecResultPresenter from './SpecResultPresenter';
-import { MinitestRunner, MinitestRunnerCodeLensProvider, MinitestRunnerButton, MinitestResultInterpreter } from './minitest';
+import { MinitestRunner, MinitestRunnerCodeLensProvider, MinitestRunnerButton, MinitestResultInterpreter, MinitestParser } from './minitest';
 import { SpecRunner, SpecRunnerCodeLensProvider, FailedSpecRunnerButton, SpecRunnerButton, SpecDebugButton } from './rspec';
 import { RunRspecOrMinitestArg } from './types';
 
@@ -24,9 +24,9 @@ const buildFileRunnerHandler = (minitestRunner: MinitestRunner, specRunner: Spec
 
 const buildLineRunnerHandler = (minitestRunner: MinitestRunner, specRunner: SpecRunner, debugging: boolean) => async () => {
   const filePath = vscode.window.activeTextEditor?.document.fileName;
-  const line = vscode.window.activeTextEditor?.selection.active.line;
+  const lineNo = vscode.window.activeTextEditor?.selection.active.line;
   // eslint-disable-next-line eqeqeq
-  if (!filePath || line == null) {
+  if (!filePath || lineNo == null) {
     console.error('SpecRunner: Unable to run spec / minitest file as no editor is open.');
     vscode.window.showErrorMessage('SpecRunner: Unable to run spec / minitest file. It appears that no editor is open.');
     return;
@@ -34,13 +34,27 @@ const buildLineRunnerHandler = (minitestRunner: MinitestRunner, specRunner: Spec
 
   const args: RunRspecOrMinitestArg = {
     fileName: filePath,
-    line: line + 1,
+    line: lineNo + 1,
     debugging
   };
 
   if (filePath.match(/_test\.rb$/)) {
     if (debugging) { return; } // Minitest debugging does not seem to work :(
-    minitestRunner.runTest(args);
+
+    // For minitest we need to figure out the line of the nearest test or context 🙄
+    // We do this by finding the line, then finding the first test or context line at or above it
+    const parser = new MinitestParser(vscode.window.activeTextEditor!.document);
+    const testRegions = parser.getTestRegions();
+    const contextRegions = parser.getContextRegions();
+    const reverseLineLookup = testRegions.concat(contextRegions).sort((a, b) => b.range.start.line - a.range.start.line); // Reverse order
+    const nearestTestOrContext = reverseLineLookup.filter(line => line.range.start.line < args.line)[0];
+
+    minitestRunner.runTest({
+      ...args,
+      line: nearestTestOrContext.range.start.line + 1,
+      name: nearestTestOrContext.name,
+      forLines: nearestTestOrContext.forTestLines?.map(line => line + 1)
+    });
   } else {
     specRunner.runSpec(args);
   }

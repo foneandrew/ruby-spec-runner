@@ -25,8 +25,7 @@ export class SpecRunnerCodeLensProvider implements CodeLensProvider {
       const args: RunRspecOrMinitestArg = {
         fileName: document.fileName,
         name: specRegion.name,
-        line: specRegion.range.start.line + 1,
-        fromCodeLens: true
+        line: specRegion.range.start.line + 1
       };
       if (this.config.rspecCodeLensPrompts) {
 

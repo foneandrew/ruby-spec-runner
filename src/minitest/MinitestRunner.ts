@@ -22,21 +22,21 @@ export class MinitestRunner {
     }
 
     if (arg?.fileName) {
-      this.runTestForFile(arg.fileName, arg.line, arg.name, arg.fromCodeLens, arg.debugging, arg.forLines);
+      this.runTestForFile(arg.fileName, arg.line, arg.name, arg.debugging, arg.forLines);
     } else {
       this.runCurrentTest(arg?.debugging);
     }
   }
 
-  async runTestForFile(fileName: string, line?: number, testName?: string, fromCodeLens?: boolean, debugging?: boolean, forLines?: number[]) {
+  async runTestForFile(fileName: string, line?: number, testName?: string, debugging?: boolean, forLines?: number[]) {
     try {
       if (debugging) {
-        const debugConfig = this.buildMinitestDebugConfig(fileName, this.config.rubyDebugger, line, testName, fromCodeLens, forLines);
+        const debugConfig = this.buildMinitestDebugConfig(fileName, this.config.rubyDebugger, line, testName, forLines);
         if (debugConfig) {
           vscode.debug.startDebugging(undefined, debugConfig);
         }
       } else {
-        const command = this.buildMinitestCommand(fileName, line, testName, fromCodeLens, forLines);
+        const command = this.buildMinitestCommand(fileName, line, testName, forLines);
         this.runTerminalCommand(command);
       }
       this.presenter.setPending(fileName);
@@ -58,10 +58,10 @@ export class MinitestRunner {
       return;
     }
 
-    await this.runTestForFile(filePath, undefined, undefined, undefined, debugging);
+    await this.runTestForFile(filePath, undefined, undefined, debugging);
   }
 
-  private buildMinitestDebugConfig(fileName: string, rubyDebugger: RubyDebugger, line?: number, testName?: string, fromCodeLens?: boolean, forLines?: number[]) {
+  private buildMinitestDebugConfig(fileName: string, rubyDebugger: RubyDebugger, line?: number, testName?: string, forLines?: number[]) {
     let testFile = fileName;
     let testNameFilter;
 
@@ -106,7 +106,7 @@ export class MinitestRunner {
     }
   }
 
-  private buildMinitestCommand(fileName: string, line?: number, testName?: string, fromCodeLens?: boolean, forLines?: number[]) {
+  private buildMinitestCommand(fileName: string, line?: number, testName?: string, forLines?: number[]) {
     let lines = [line];
     let testFile = fileName;
     let testNameFilter;
@@ -123,10 +123,7 @@ export class MinitestRunner {
     const cdCommand = this.buildChangeDirectoryToWorkspaceRootCommand();
     const minitestCommand = [stringifyEnvs(this.config.minitestEnv), this.config.minitestCommand, quote(testFile)].filter(Boolean).join(' ');
 
-    let lineNumber = JSON.stringify(lines) || 'ALL';
-    if (fromCodeLens) {
-      lineNumber = `${lineNumber} true`;
-    }
+    const lineNumber = JSON.stringify(lines) || 'ALL';
     const saveRunOptions = cmdJoin(`echo ${fileName} > ${this.outputFilePath}`, `echo ${quote(lineNumber)} >> ${this.outputFilePath}`);
     const outputRedirect = `| ${teeCommand(this.outputFilePath, true, this.config.usingBashInWindows)}`;
     if (this.config.minitestDecorateEditorWithResults) {

@@ -26,8 +26,7 @@ export class MinitestRunnerCodeLensProvider implements CodeLensProvider {
       const args: RunRspecOrMinitestArg = {
         fileName: document.fileName,
         name: testRegion.name,
-        line: testRegion.range.start.line + 1,
-        fromCodeLens: true
+        line: testRegion.range.start.line + 1
       };
       codeLens.push(new CodeLens(
         testRegion.range,
@@ -45,7 +44,6 @@ export class MinitestRunnerCodeLensProvider implements CodeLensProvider {
         fileName: document.fileName,
         name: contextRegion.name,
         line: contextRegion.range.start.line + 1,
-        fromCodeLens: true,
         forLines: contextRegion.forTestLines?.map(line => line + 1)
       };
       codeLens.push(new CodeLens(

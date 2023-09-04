@@ -56,23 +56,14 @@ export class MinitestResultInterpreter {
       return;
     }
 
-    const match = line.match(/^(?<lineNumbers>\[[\d,]+\])\s?(?<fromCodeLens>true)?$/);
+    const match = line.match(/^(?<lineNumbers>\[[\d,]+\])$/);
     let testRunLineNumbers: number[] = match?.groups?.lineNumbers ? JSON.parse(match?.groups?.lineNumbers) : undefined;
     let testRunLineNumber = testRunLineNumbers?.length === 1 ? testRunLineNumbers[0] : undefined;
-    const fromCodeLens = match?.groups?.fromCodeLens;
 
     const strippedOutput = minitestOutput.replace(this.colorCodesMatcher, '');
     const parser = new MinitestParser(file);
     const testRegions = parser.getTestRegions();
     const reversedTestLines = testRegions.map(r => r.range.start.line + 1).reverse();
-
-    // eslint-disable-next-line eqeqeq
-    if (testRunLineNumber != null && !fromCodeLens) {
-      // Keyboard shortcut was used to run the test
-      // Need to find the line of the test that was run
-      // Will probably be the first test line above the line that was run
-      testRunLineNumber = reversedTestLines.filter(line => line <= testRunLineNumber!)[0];
-    }
 
     const testResults: TestResults = {};
     const testRun = Date.now().toString();
