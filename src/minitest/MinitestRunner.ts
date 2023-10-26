@@ -108,7 +108,7 @@ export class MinitestRunner {
   }
 
   private buildMinitestCommand(fileName: string, line?: number, testName?: string, forLines?: number[]) {
-    let lines = [line];
+    let lines = [line].filter(Boolean);
     let testFile = fileName;
     let testNameFilter;
 
@@ -125,7 +125,7 @@ export class MinitestRunner {
     const cdCommand = this.buildChangeDirectoryToWorkspaceRootCommand();
     const minitestCommand = [stringifyEnvs(this.config.minitestEnv), this.config.minitestCommand, minitestArgs].filter(Boolean).join(' ');
 
-    const lineNumber = JSON.stringify(lines) || 'ALL';
+    const lineNumber = lines.length ? JSON.stringify(lines) : 'ALL';
     const saveRunOptions = cmdJoin(`echo ${fileName} > ${this.outputFilePath}`, `echo ${quote(lineNumber)} >> ${this.outputFilePath}`);
     const outputRedirect = `| ${teeCommand(this.outputFilePath, true, this.config.usingBashInWindows)}`;
     if (this.config.minitestDecorateEditorWithResults) {

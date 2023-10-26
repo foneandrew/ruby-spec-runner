@@ -2,6 +2,10 @@
 
 All notable changes to the "spec-runner" extension will be documented in this file.
 
+## [3.8.2]
+
+- Fix running minitest for the entire current file
+
 ## [3.8.1]
 
 - Pass `--` to minitest when using the `-n` option.
