@@ -1,10 +1,10 @@
 import * as assert from 'assert';
 import * as path from 'path';
 import * as vscode from 'vscode';
-import { SpecParser } from '../../../rspec';
+import { SpecParser } from '../../rspec';
 
 // Test is run in the out folder, so have to bust out and back into src folder
-const testFileLocation = '/../../../../src/test/examples/example_spec.rb';
+const testFileLocation = '/../../../src/test/examples/example_spec.rb';
 
 const expectedCodeLensLocations = [
 	0,

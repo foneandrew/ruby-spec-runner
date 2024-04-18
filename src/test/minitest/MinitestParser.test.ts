@@ -1,10 +1,10 @@
 import * as assert from 'assert';
 import * as path from 'path';
 import * as vscode from 'vscode';
-import { MinitestParser } from '../../../minitest';
+import { MinitestParser } from '../../minitest';
 
 // Test is run in the out folder, so have to bust out and back into src folder
-const testFileLocation = '/../../../../src/test/examples/example_test.rb';
+const testFileLocation = '/../../../src/test/examples/example_test.rb';
 
 const expectedTestCodeLensLocations = [
 	6,
