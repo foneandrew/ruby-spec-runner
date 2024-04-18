@@ -64,6 +64,66 @@ This extension contributes the following settings:
 - `ruby-spec-runner.overviewHighlightPosition`: Configure the position of result highlights in the overview ruler
 - `ruby-spec-runner.clearTerminalOnTestRun`: Clear the terminal before running a test command
 - `ruby-spec-runner.rubyDebugger`: Select which debugging extension to use
+- `ruby-spec-runner.rewriteTestPaths`: Change the test path that is run. See [Rewriting the test file path](#rewriting-the-test-file-path) for more info.
+
+### Rewriting the test file path
+
+If you're running tests inside a docker container you may need to rewrite the test file path. You can do this with the `ruby-spec-runner.rewriteTestPaths` setting. At the moment vscode will only let you edit it via the json file.
+
+Each entry takes 2-4 fields:
+
+- `from` This is the string to match
+- `to` This is the string to replace the match with. When using a regex can reference group constructs like "$1" [(see mdn docs for capabilities)](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/replace#specifying_a_string_as_the_replacement)
+- `regex` _(Optional, default: false)_ treat "from" as a regex. Regexs are applied with global flag. `\` characters will need to be escaped.
+- `exclusive` _(Optional, default: true)_ if this entry produces a match, stop looking for other matches
+
+#### Simple example
+
+```json
+{
+  "ruby-spec-runner.rewriteTestPaths": [
+    {
+      "from": "/Users/me/dev/my_project",
+      "to": "/app"
+    },
+    {
+      "from": "/Users/me/dev/my_other_project",
+      "to": ""
+    },
+  ],
+}
+```
+
+#### Complex example
+
+For more complex re-mappings regex can use regex, regex groups, and combine entries together.
+
+```json
+{
+  // For path "/Users/me/dev/my_project/spec/models/model_spec.rb"
+  "ruby-spec-runner.rewriteTestPaths": [
+    {
+      "from": "me/",
+      "to": "someone/",
+      "exclusive": false
+      // Result is "/Users/someone/dev/my_project/spec/models/model_spec.rb"
+    },
+    {
+      "from": "^.*/my_project",
+      "to": "/app",
+      "regex": true
+      // Result is "/app/spec/models/model_spec.rb"
+    },
+    {
+      "from": "^/Users/(\\w+)/dev/",
+      "to": "devs/$1_home/",
+      "regex": true
+      // Result is "devs/someone_home/my_project/spec/models/model_spec.rb"
+      // (as "me" is replaced with "someone" by the first entry )
+    },
+  ],
+}
+```
 
 ## Known Issues
 
@@ -77,4 +137,4 @@ This extension contributes the following settings:
 
 ## Release Notes
 
-... Are in the `changelog` tab
+... Are found in the `Changelog` page (under "Resources").

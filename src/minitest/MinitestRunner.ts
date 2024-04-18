@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import SpecRunnerConfig, { TerminalClear } from '../SpecRunnerConfig';
-import { cmdJoin, quote, stringifyEnvs, teeCommand } from '../util';
+import { cmdJoin, quote, remapPath, stringifyEnvs, teeCommand } from '../util';
 import SpecResultPresenter from '../SpecResultPresenter';
 import { RubyDebugger, RunRspecOrMinitestArg } from '../types';
 
@@ -31,12 +31,12 @@ export class MinitestRunner {
   async runTestForFile(fileName: string, line?: number, testName?: string, debugging?: boolean, forLines?: number[]) {
     try {
       if (debugging) {
-        const debugConfig = this.buildMinitestDebugConfig(fileName, this.config.rubyDebugger, line, testName, forLines);
+        const debugConfig = this.buildMinitestDebugConfig(this.remappedPath(fileName), this.config.rubyDebugger, line, testName, forLines);
         if (debugConfig) {
           vscode.debug.startDebugging(undefined, debugConfig);
         }
       } else {
-        const command = this.buildMinitestCommand(fileName, line, testName, forLines);
+        const command = this.buildMinitestCommand(this.remappedPath(fileName), line, testName, forLines);
         this.runTerminalCommand(command);
       }
       this.presenter.setPending(fileName);
@@ -137,6 +137,10 @@ export class MinitestRunner {
 
   private buildChangeDirectoryToWorkspaceRootCommand() {
     return this.config.changeDirectoryToWorkspaceRoot ? `cd ${quote(this.config.projectPath)}` : '';
+  }
+
+  private remappedPath(filePath: string) {
+    return remapPath(filePath, this.config.rewriteTestPaths);
   }
 
   private async runTerminalCommand(command: string) {

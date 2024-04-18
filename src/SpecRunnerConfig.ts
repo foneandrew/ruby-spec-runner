@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { RubyDebugger } from './types';
+import { RubyDebugger, TestPathReplacementConfig } from './types';
 
 /* eslint-disable @typescript-eslint/naming-convention */
 export const enum TerminalClear {
@@ -147,6 +147,24 @@ export class SpecRunnerConfig {
       default:
         return RubyDebugger.Rdbg;
     };
+  }
+
+  get rewriteTestPaths(): TestPathReplacementConfig[] {
+    const config = vscode.workspace.getConfiguration().get('ruby-spec-runner.rewriteTestPaths') || [];
+    if (!Array.isArray(config)) {
+      throw new Error('ruby-spec-runner.rewriteTestPaths must be an array');
+    }
+
+    return config
+      .filter(({ from, to }: TestPathReplacementConfig) => typeof from === 'string' && typeof to === 'string')
+      .map(({ from, to, regex, exclusive }: TestPathReplacementConfig): TestPathReplacementConfig => (
+        {
+          from,
+          to,
+          regex: regex ?? false,
+          exclusive: exclusive ?? true
+        }
+      ));
   }
 
   private getBooleanConfig(key: string, defaultValue: boolean) {

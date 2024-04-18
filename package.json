@@ -241,6 +241,35 @@
 					"default": "Rdbg",
 					"markdownDescription": "Which ruby debugger to use\n\n* **Rdbg:** The [ruby debug vscode extension](https://marketplace.visualstudio.com/items?itemName=KoichiSasada.vscode-rdbg)\n* **RubyLSP:** The [ruby-lsp vscode extension](https://marketplace.visualstudio.com/items?itemName=Shopify.ruby-lsp)",
 					"scope": "window"
+				},
+				"ruby-spec-runner.rewriteTestPaths": {
+					"type": "array",
+					"default": [],
+					"markdownDescription": "Rewrite paths in the test command. Useful for changing paths in the test command to match the environment the tests are run in (Docker etc). See the [the readme](https://marketplace.visualstudio.com/items?itemName=Fooo.ruby-spec-runner#rewriting-the-test-file-path) for more details.",
+					"items": {
+						"title": "Path mappings",
+						"type": "object",
+						"properties": {
+							"from": {
+								"type": "string",
+								"description": "The path to match"
+							},
+							"to": {
+								"type": "string",
+								"description": "The replacement path"
+							},
+							"regex": {
+								"type": "boolean",
+								"description": "Treat 'from' as a regex pattern",
+								"default": false
+							},
+							"exclusive": {
+								"type": "boolean",
+								"description": "Stop looking for other matches after successfully applying this rule",
+								"default": true
+							}
+						}
+					}
 				}
 			}
 		}

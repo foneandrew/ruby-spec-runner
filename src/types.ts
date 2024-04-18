@@ -17,6 +17,13 @@ export enum RubyDebugger {
   RubyLSP = 'ruby_lsp'
 }
 
+export interface TestPathReplacementConfig {
+  from: string;
+  to: string;
+  regex: boolean;
+  exclusive: boolean;
+}
+
 interface RunRspecOrMinitestArgBase {
   name?: string;
   debugging?: boolean;

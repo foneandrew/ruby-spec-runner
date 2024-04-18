@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import SpecRunnerConfig, { TerminalClear } from '../SpecRunnerConfig';
-import { cmdJoin, quote, stringifyEnvs } from '../util';
+import { cmdJoin, quote, remapPath, stringifyEnvs } from '../util';
 import SpecResultPresenter from '../SpecResultPresenter';
 import { RubyDebugger, RunRspecOrMinitestArg } from '../types';
 
@@ -39,12 +39,12 @@ export class SpecRunner {
   async runSpecForFile(fileName: string, failedOnly: boolean, line?: number, testName?: string, debugging?: boolean) {
     try {
       if (debugging) {
-        const debugConfig = this.buildRspecDebugConfig(fileName, failedOnly, this.config.rubyDebugger, line, testName);
+        const debugConfig = this.buildRspecDebugConfig(this.remappedPath(fileName), failedOnly, this.config.rubyDebugger, line, testName);
         if (debugConfig) {
           vscode.debug.startDebugging(undefined, debugConfig);
         }
       } else {
-        const command = this.buildRspecCommand(fileName, failedOnly, line, testName);
+        const command = this.buildRspecCommand(this.remappedPath(fileName), failedOnly, line, testName);
         this.runTerminalCommand(command);
       }
 
@@ -120,6 +120,10 @@ export class SpecRunner {
     const cdCommand = this.buildChangeDirectoryToWorkspaceRootCommand();
     const rspecCommand = [stringifyEnvs(this.config.rspecEnv), this.config.rspecCommand, failedOnlyModifier, format, jsonOutput, quote(file)].filter(Boolean).join(' ');
     return cmdJoin(cdCommand, rspecCommand);
+  }
+
+  private remappedPath(filePath: string) {
+    return remapPath(filePath, this.config.rewriteTestPaths);
   }
 
   private buildChangeDirectoryToWorkspaceRootCommand() {
