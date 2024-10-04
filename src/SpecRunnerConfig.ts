@@ -1,12 +1,10 @@
 import * as vscode from 'vscode';
 import { RubyDebugger, TestPathReplacementConfig } from './types';
 
-/* eslint-disable @typescript-eslint/naming-convention */
 export const enum TerminalClear {
   None = 'none',
   Clear = 'clear',
 }
-/* eslint-enable @typescript-eslint/naming-convention */
 
 export class SpecRunnerConfig {
   get rspecCommand(): string {

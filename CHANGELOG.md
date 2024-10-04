@@ -2,6 +2,12 @@
 
 All notable changes to the "spec-runner" extension will be documented in this file.
 
+## [3.10.0]
+
+- Rspec supports relative file paths for error backtraces (fixes error highlighting)
+- Add coloured underline for test names
+- Update dependencies
+
 ## [3.8.2]
 
 - Fix running minitest for the entire current file

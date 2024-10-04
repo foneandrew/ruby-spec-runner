@@ -6,6 +6,7 @@ import { isRspecOutput } from '../util';
 import { RspecException, RspecOutput, TestResultException, TestResults } from '../types';
 import { SpecRunnerConfig } from '../SpecRunnerConfig';
 import SpecResultPresenter from '../SpecResultPresenter';
+import path from 'path';
 
 export class SpecResultInterpreter {
   private config: SpecRunnerConfig;
@@ -52,7 +53,6 @@ export class SpecResultInterpreter {
     const testRun = Date.now().toString();
     const testResults: TestResults = {};
 
-    // eslint-disable-next-line @typescript-eslint/naming-convention
     await Promise.all(examples.map(async ({ file_path, line_number, id, status, exception, description, run_time, pending_message }) => {
       const absoluteFilePath = await this.testFilePath(file_path);
       const fileResults = testResults[absoluteFilePath] ||= {
@@ -112,7 +112,16 @@ export class SpecResultInterpreter {
 
     if (!file) { return testException; }
 
-    const exceptionLine = exception.backtrace.find(traceLine => new RegExp(`^${file.fileName}:\\d+:in`).test(traceLine));
+    const exceptionLine = exception.backtrace.find(traceLine => {
+      if (traceLine.startsWith('./')) {
+        // Using relative paths
+        return vscode.workspace.workspaceFolders?.find((folder) => {
+          return new RegExp(`${path.relative(folder.uri.fsPath, file.fileName)}:\\d+:in`).test(traceLine);
+        });
+      } else {
+        return new RegExp(`^${file.fileName}:\\d+:in`).test(traceLine);
+      }
+    });
     if (!exceptionLine) { return testException; }
 
     const match = exceptionLine.match(/:(\d+):in/);

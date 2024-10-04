@@ -102,11 +102,11 @@ export function activate(context: vscode.ExtensionContext) {
   const minitestCodeLensProvider = new MinitestRunnerCodeLensProvider(config);
 
   const specDocSelectors: vscode.DocumentFilter[] = [
-    { language: 'ruby', pattern: '**/*_spec.rb' },
+    { scheme: 'file', language: 'ruby', pattern: '**/*_spec.rb' },
   ];
   const specCodeLensProviderDisposable = vscode.languages.registerCodeLensProvider(specDocSelectors, specCodeLensProvider);
   const minitestDocSelectors: vscode.DocumentFilter[] = [
-    { language: 'ruby', pattern: '**/*_test.rb' },
+    { scheme: 'file', language: 'ruby', pattern: '**/*_test.rb' },
   ];
   const minitestCodeLensProviderDisposable = vscode.languages.registerCodeLensProvider(minitestDocSelectors, minitestCodeLensProvider);
 

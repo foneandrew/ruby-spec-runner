@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import { RspecExampleStatus, TestResultException, TestResultLineResult, TestResults } from './types';
 import SpecRunnerConfig from './SpecRunnerConfig';
+import { DecorationRenderOptions } from 'vscode';
 
 interface ConfigurableEditorDecorations {
   passedGutter: vscode.TextEditorDecorationType;
@@ -58,8 +59,16 @@ export class SpecResultPresenter {
     this._editorDecorations = this.buildConfigurableEditorDecorations();
 
     this.testRunPendingGutter = this.buildEditorDecoration('test_run_pending.svg');
-    this.failedLine = vscode.window.createTextEditorDecorationType({ backgroundColor: '#dc113766', overviewRulerColor: '#e15656ba', overviewRulerLane: vscode.OverviewRulerLane.Full });
-    this.staleFailedLine = vscode.window.createTextEditorDecorationType({ backgroundColor: '#dc113733', overviewRulerColor: '#dc113766', overviewRulerLane: vscode.OverviewRulerLane.Full });
+    this.failedLine = vscode.window.createTextEditorDecorationType({
+      backgroundColor: '#dc113766',
+      overviewRulerColor: '#e15656ba',
+      overviewRulerLane: vscode.OverviewRulerLane.Full,
+    });
+    this.staleFailedLine = vscode.window.createTextEditorDecorationType({
+      backgroundColor: '#dc113733',
+      overviewRulerColor: '#dc113766',
+      overviewRulerLane: vscode.OverviewRulerLane.Full,
+    });
 
     this.config = config;
 
@@ -338,8 +347,10 @@ export class SpecResultPresenter {
           hoverMessage = params.messageFromTestResult(result);
         }
 
+        const lineStart = result.content.match(/\S/)?.index ?? 0;
+
         return {
-          range: new vscode.Range(result.line - 1, 0, result.line - 1, result.content.length),
+          range: new vscode.Range(result.line - 1, lineStart, result.line - 1, result.content.length),
           hoverMessage
         };
       });
@@ -413,19 +424,32 @@ export class SpecResultPresenter {
       .forEach(([key, position]) => {
         decorations[key] = {
           passedGutter: this.buildEditorDecoration('passed.svg', '#69e06dba', position),
-          stalePassedGutter: this.buildEditorDecoration('passed_stale.svg', '#69e06dba', position),
+          stalePassedGutter: this.buildEditorDecoration('passed_stale.svg', '#69e06dba', position, { borderStyle: 'dashed', borderWidth: '0 0 1px 0' }),
           pendingGutter: this.buildEditorDecoration('pending.svg', '#e0be69ba', position),
-          stalePendingGutter: this.buildEditorDecoration('pending_stale.svg', '#e0be69ba', position),
+          stalePendingGutter: this.buildEditorDecoration('pending_stale.svg', '#e0be69ba', position, { borderStyle: 'dashed', borderWidth: '0 0 1px 0' }),
           failedGutter: this.buildEditorDecoration('failed.svg', '#e15656ba', position),
-          staleFailedGutter: this.buildEditorDecoration('failed_stale.svg', '#e15656ba', position)
+          staleFailedGutter: this.buildEditorDecoration('failed_stale.svg', '#e15656ba', position, { borderStyle: 'dashed', borderWidth: '0 0 1px 0' })
         };
       });
 
     return decorations as ConfigurableEditorDecorationsCollection;
   }
 
-  private buildEditorDecoration(icon: string, rulerColor?: string, position?: vscode.OverviewRulerLane) {
-    return vscode.window.createTextEditorDecorationType({ gutterIconPath: path.join(__dirname, '..', 'resources', icon), overviewRulerColor: rulerColor, overviewRulerLane: position });
+  private buildEditorDecoration(icon: string, rulerColor?: string, position?: vscode.OverviewRulerLane, customisation?: Partial<DecorationRenderOptions>): vscode.TextEditorDecorationType {
+    let decorationConfig: DecorationRenderOptions = {
+      gutterIconPath: path.join(__dirname, '..', 'resources', icon),
+      overviewRulerColor: rulerColor,
+      overviewRulerLane: position
+    };
+    if (rulerColor) {
+      decorationConfig = {
+        ... decorationConfig,
+        borderColor: rulerColor,
+        borderStyle: 'solid',
+        borderWidth: '0 0 2px 0'
+      };
+    }
+    return vscode.window.createTextEditorDecorationType({ ...decorationConfig, ...customisation });
   }
 }
 
