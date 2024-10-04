@@ -2,6 +2,10 @@
 
 All notable changes to the "spec-runner" extension will be documented in this file.
 
+## [3.11.0]
+
+- Remove underline for passed tests to reduce visual noise
+
 ## [3.10.0]
 
 - Rspec supports relative file paths for error backtraces (fixes error highlighting)

@@ -423,8 +423,8 @@ export class SpecResultPresenter {
     ([['left', vscode.OverviewRulerLane.Left], ['right', vscode.OverviewRulerLane.Right], ['center', vscode.OverviewRulerLane.Center]] as ['left' | 'right' | 'center', vscode.OverviewRulerLane][])
       .forEach(([key, position]) => {
         decorations[key] = {
-          passedGutter: this.buildEditorDecoration('passed.svg', '#69e06dba', position),
-          stalePassedGutter: this.buildEditorDecoration('passed_stale.svg', '#69e06dba', position, { borderStyle: 'dashed', borderWidth: '0 0 1px 0' }),
+          passedGutter: this.buildEditorDecoration('passed.svg', '#69e06dba', position, { borderWidth: '0' }),
+          stalePassedGutter: this.buildEditorDecoration('passed_stale.svg', '#69e06dba', position, { borderWidth: '0' }),
           pendingGutter: this.buildEditorDecoration('pending.svg', '#e0be69ba', position),
           stalePendingGutter: this.buildEditorDecoration('pending_stale.svg', '#e0be69ba', position, { borderStyle: 'dashed', borderWidth: '0 0 1px 0' }),
           failedGutter: this.buildEditorDecoration('failed.svg', '#e15656ba', position),
