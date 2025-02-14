@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import SpecRunnerConfig, { TerminalClear } from '../SpecRunnerConfig';
-import { cmdJoin, quote, remapPath, stringifyEnvs } from '../util';
+import { cdCommands, cmdJoin, quote, remapPath, stringifyEnvs } from '../util';
 import SpecResultPresenter from '../SpecResultPresenter';
 import { RubyDebugger, RunRspecOrMinitestArg } from '../types';
 
@@ -117,9 +117,11 @@ export class SpecRunner {
     const format = `-f ${this.config.rspecFormat}`;
     const jsonOutput = this.config.rspecDecorateEditorWithResults ? `-f j --out ${quote(this.outputFilePath)}` : '';
 
-    const cdCommand = this.buildChangeDirectoryToWorkspaceRootCommand();
+    const [cdCommand, returnCommand] = this.buildChangeDirectoryToWorkspaceRootCommand();
     const rspecCommand = [stringifyEnvs(this.config.rspecEnv), this.config.rspecCommand, failedOnlyModifier, format, jsonOutput, quote(file)].filter(Boolean).join(' ');
-    return cmdJoin(cdCommand, rspecCommand);
+
+    const fullCommand = cmdJoin(cdCommand, rspecCommand, returnCommand || '');
+    return returnCommand === false ? `(${fullCommand})` : fullCommand;
   }
 
   private remappedPath(filePath: string) {
@@ -127,7 +129,11 @@ export class SpecRunner {
   }
 
   private buildChangeDirectoryToWorkspaceRootCommand() {
-    return this.config.changeDirectoryToWorkspaceRoot ? `cd ${quote(this.config.projectPath)}` : '';
+    if (!this.config.changeDirectoryToWorkspaceRoot) {
+      return ['', ''];
+    }
+
+    return cdCommands(this.config.projectPath, this.config.usingBashInWindows);
   }
 
   private async runTerminalCommand(command: string) {

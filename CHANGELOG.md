@@ -2,6 +2,11 @@
 
 All notable changes to the "spec-runner" extension will be documented in this file.
 
+## [4.0.0]
+
+- Changing directory to workspace root will now return to the previous directory after the command has finished
+  - (I don't have access to a windows machine so have done my best but can't guarantee that it isn't broken)
+
 ## [3.11.0]
 
 - Remove underline for passed tests to reduce visual noise

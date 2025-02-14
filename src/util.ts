@@ -16,9 +16,23 @@ export function teeCommand(outputFile: string, append = false, bashInWindowsOver
   return command.join(' ');
 }
 
-// Windows will still execute second command even if first command fails.
-export function cmdJoin(...args: string[]): string {
-  return args.filter(Boolean).join(isWindows() ? '; ' : ' && ');
+/**
+ * Returns two commands, the cdCommand and the returnCommand.
+ *
+ * If the returnCommand is false, then that means we should use a subshell to handle
+ * returning to the current directory.
+ */
+export function cdCommands(path: string, bashInWindowsOverride = false): [string, string | false] {
+  if (isWindows() && !bashInWindowsOverride) {
+    return [`pushd ${quote(path)} >nul`, 'popd >nul'];
+  }
+  return [`cd ${quote(path)}`, false];
+}
+
+export function cmdJoin(...args: Array<string>): string {
+  return args
+    .filter(Boolean)
+    .join(isWindows() ? '; ' : ' && ');
 }
 
 export function isRspecOutput(output: any): output is RspecOutput {

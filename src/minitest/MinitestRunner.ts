@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import SpecRunnerConfig, { TerminalClear } from '../SpecRunnerConfig';
-import { cmdJoin, quote, remapPath, stringifyEnvs, teeCommand } from '../util';
+import { cdCommands, cmdJoin, quote, remapPath, stringifyEnvs, teeCommand } from '../util';
 import SpecResultPresenter from '../SpecResultPresenter';
 import { RubyDebugger, RunRspecOrMinitestArg } from '../types';
 
@@ -122,21 +122,33 @@ export class MinitestRunner {
     }
     const minitestArgs = [quote(testFile), testNameFilter].filter(Boolean).join(' -- ');
 
-    const cdCommand = this.buildChangeDirectoryToWorkspaceRootCommand();
+    const [cdCommand, returnCommand] = this.buildChangeDirectoryToWorkspaceRootCommand();
     const minitestCommand = [stringifyEnvs(this.config.minitestEnv), this.config.minitestCommand, minitestArgs].filter(Boolean).join(' ');
 
     const lineNumber = lines.length ? JSON.stringify(lines) : 'ALL';
     const saveRunOptions = cmdJoin(`echo ${fileName} > ${this.outputFilePath}`, `echo ${quote(lineNumber)} >> ${this.outputFilePath}`);
     const outputRedirect = `| ${teeCommand(this.outputFilePath, true, this.config.usingBashInWindows)}`;
+
+    let fullCommand;
     if (this.config.minitestDecorateEditorWithResults) {
-      return cmdJoin(cdCommand, saveRunOptions, [minitestCommand, outputRedirect].filter(Boolean).join(' '));
+      fullCommand = cmdJoin(cdCommand, saveRunOptions, [minitestCommand, outputRedirect].filter(Boolean).join(' '));
+    } else {
+      fullCommand = cmdJoin(cdCommand, minitestCommand);
     }
 
-    return cmdJoin(cdCommand, minitestCommand);
+    if (returnCommand === false) {
+      return `(${fullCommand})`;
+    } else {
+      return cmdJoin(fullCommand, returnCommand);
+    }
   }
 
   private buildChangeDirectoryToWorkspaceRootCommand() {
-    return this.config.changeDirectoryToWorkspaceRoot ? `cd ${quote(this.config.projectPath)}` : '';
+    if (!this.config.changeDirectoryToWorkspaceRoot) {
+      return ['', ''];
+    }
+
+    return cdCommands(this.config.projectPath, this.config.usingBashInWindows);
   }
 
   private remappedPath(filePath: string) {
