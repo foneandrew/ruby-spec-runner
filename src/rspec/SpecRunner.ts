@@ -121,6 +121,10 @@ export class SpecRunner {
     const rspecCommand = [stringifyEnvs(this.config.rspecEnv), this.config.rspecCommand, failedOnlyModifier, format, jsonOutput, quote(file)].filter(Boolean).join(' ');
 
     const fullCommand = cmdJoin(cdCommand, rspecCommand, returnCommand || '');
+
+    // IMPORTANT: Fish shell compatibility depends on the cdCommands function in util.ts
+    // For Fish shell, returnCommand should never be false to avoid parentheses syntax
+    // which Fish interprets as command substitution rather than command grouping
     return returnCommand === false ? `(${fullCommand})` : fullCommand;
   }
 
