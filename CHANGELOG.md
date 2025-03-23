@@ -2,6 +2,10 @@
 
 All notable changes to the "spec-runner" extension will be documented in this file.
 
+## [4.0.1]
+
+- Fix issue with changeDirectoryToWorkspaceRoot setting and fish shell (fixes #11, thanks @steveclarke)
+
 ## [4.0.0]
 
 - Changing directory to workspace root will now return to the previous directory after the command has finished

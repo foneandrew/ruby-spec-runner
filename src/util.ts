@@ -29,21 +29,21 @@ export function isFishShell(): boolean {
  *
  * If the returnCommand is false, then that means we should use a subshell to handle
  * returning to the current directory.
- * 
- * For Fish shell, we use pushd/popd instead of parentheses grouping
+ *
+ * For shells that are incompatible with () style subshells we use pushd/popd as a fallback.
+ * Subshells are generally preferred as they more resilient to a command failing inside the
+ * subshell (with pushd/popd the command may exit before reaching popd).
  */
 export function cdCommands(path: string, bashInWindowsOverride = false): [string, string | false] {
   if (isWindows() && !bashInWindowsOverride) {
     return [`pushd ${quote(path)} >nul`, 'popd >nul'];
   }
 
-  // Check if we're using Fish shell
   if (isFishShell()) {
-    // Fish shell doesn't support the parentheses grouping syntax
-    // Use pushd/popd instead which works in Fish
-    return [`pushd ${quote(path)}`, 'popd'];
+    // Use pushd/popd fallback for shells that do not support () style subshells.
+    return [`pushd ${quote(path)} >/dev/null`, 'popd >/dev/null'];
   }
-  
+
   return [`cd ${quote(path)}`, false];
 }
 
