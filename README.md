@@ -65,6 +65,7 @@ This extension contributes the following settings:
 - `ruby-spec-runner.clearTerminalOnTestRun`: Clear the terminal before running a test command
 - `ruby-spec-runner.rubyDebugger`: Select which debugging extension to use
 - `ruby-spec-runner.rewriteTestPaths`: Change the test path that is run. See [Rewriting the test file path](#rewriting-the-test-file-path) for more info.
+- `ruby-spec-runner.outputFilePath`: Specify the test output file path. Having a predictable path can allow for test runs to be triggered by other programs (eg guard)
 
 ### Rewriting the test file path
 

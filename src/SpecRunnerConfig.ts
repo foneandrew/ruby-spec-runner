@@ -165,6 +165,16 @@ export class SpecRunnerConfig {
       ));
   }
 
+  get outputFilePath(): string | undefined {
+    const config = vscode.workspace.getConfiguration().get<string>('ruby-spec-runner.outputFilePath');
+    return config?.trim() === '' ? undefined : config;
+  }
+
+  get usingCustomOutputPath(): boolean {
+    // eslint-disable-next-line eqeqeq
+    return this.outputFilePath != undefined;
+  }
+
   private getBooleanConfig(key: string, defaultValue: boolean) {
     const result = vscode.workspace.getConfiguration().get(key) as boolean | undefined;
     // eslint-disable-next-line eqeqeq

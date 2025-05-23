@@ -2,6 +2,10 @@
 
 All notable changes to the "spec-runner" extension will be documented in this file.
 
+## [4.1.0]
+
+- Add config item `ruby-spec-runner.outputFilePath` to aid with running rspec via guard.
+
 ## [4.0.1]
 
 - Fix issue with changeDirectoryToWorkspaceRoot setting and fish shell (fixes #11, thanks @steveclarke)

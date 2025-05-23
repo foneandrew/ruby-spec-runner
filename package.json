@@ -9,7 +9,7 @@
 	},
 	"icon": "images/icon.png",
 	"license": "MIT",
-	"version": "4.0.1",
+	"version": "4.1.0",
 	"engines": {
 		"vscode": "^1.94.0"
 	},
@@ -270,6 +270,12 @@
 							}
 						}
 					}
+				},
+				"ruby-spec-runner.outputFilePath": {
+					"type": "string",
+					"default": "",
+					"markdownDescription": "Specify the absolute path (e.g. `/path/to/my/rspec-results.json`) for the test result output. Useful for triggering rspec manually (eg from Guard).\n\nUses a temp file if left blank. **Changes require vscode restart**",
+					"scope": "window"
 				}
 			}
 		}

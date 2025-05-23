@@ -12,7 +12,7 @@ export class SpecResultInterpreter {
   private config: SpecRunnerConfig;
   private presenter: SpecResultPresenter;
 
-  private _tmpOutputFile!: tmp.FileResult;
+  private _outputFile!: tmp.FileResult;
 
   constructor(config: SpecRunnerConfig, context: vscode.ExtensionContext, presenter: SpecResultPresenter) {
     this.config = config;
@@ -160,7 +160,26 @@ export class SpecResultInterpreter {
   }
 
   private get outputFile() {
-    return this._tmpOutputFile ||= this.createTempFile();
+
+    return this._outputFile ||= (this.config.usingCustomOutputPath ? this.createOutputFile() : this.createTempFile());
+  }
+
+  private createOutputFile() {
+    if (!this.config.outputFilePath) {
+      throw new Error('Output file path is not set');
+    }
+
+    vscode.workspace.fs.writeFile(vscode.Uri.file(this.config.outputFilePath), Buffer.from(''))
+
+    const file: tmp.FileResult = {
+      name: this.config.outputFilePath,
+      fd: -1,  // dummy fd since we're not using real tmp file
+      removeCallback: () => {} // dummy callback since we don't need to remove custom files
+    };
+
+    chokidar.watch(file.name).on('change', (_event, _path) => this.updateFromOutputFile());
+
+    return file;
   }
 
   private createTempFile() {
