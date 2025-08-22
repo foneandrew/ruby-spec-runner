@@ -52,6 +52,20 @@ export class SpecRunnerConfig {
     };
   }
 
+  get rspecSingleLineFormat(): string {
+    const format = vscode.workspace.getConfiguration().get('ruby-spec-runner.rspecSingleLineFormat') as string | undefined;
+
+    switch (format) {
+      case 'Documentation':
+        return 'd';
+      case 'Progress':
+        return 'p';
+      case 'Use Default Format':
+      default:
+        return this.rspecFormat;
+    };
+  }
+
   get overviewHighlightPosition() {
     const format = vscode.workspace.getConfiguration().get('ruby-spec-runner.overviewHighlightPosition') as string | undefined;
 
