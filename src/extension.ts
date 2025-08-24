@@ -18,6 +18,9 @@ const buildFileRunnerHandler = (minitestRunner: MinitestRunner, specRunner: Spec
     if (debugging) { return; } // Minitest debugging does not seem to work :(
     minitestRunner.runTest({ ...args, debugging });
   } else {
+    if (debugging) {
+      vscode.commands.executeCommand('workbench.action.debug.console.focus');
+    }
     specRunner.runSpec({ ...args, debugging });
   }
 };
@@ -56,6 +59,9 @@ const buildLineRunnerHandler = (minitestRunner: MinitestRunner, specRunner: Spec
       forLines: nearestTestOrContext.forTestLines?.map(line => line + 1)
     });
   } else {
+    if (debugging) {
+      vscode.commands.executeCommand('workbench.action.debug.console.focus');
+    }
     specRunner.runSpec(args);
   }
 };
