@@ -129,6 +129,17 @@
 					"markdownDescription": "Rspec: Output format for rspec.\n\n- **Documentation:** group and example names\n- **Progress:** dots for each example",
 					"scope": "window"
 				},
+				"ruby-spec-runner.rspecSingleLineFormat": {
+					"type": "string",
+					"enum": [
+						"Documentation",
+						"Progress",
+						"Use Default Format"
+					],
+					"default": "Use Default Format",
+					"markdownDescription": "Rspec: Output format for single line tests (when running individual examples).\n\n- **Documentation:** group and example names\n- **Progress:** dots for each example\n- **Use Default Format:** use the same format as `rspecFormat`",
+					"scope": "window"
+				},
 				"ruby-spec-runner.saveBeforeRunning": {
 					"type": "boolean",
 					"default": true,

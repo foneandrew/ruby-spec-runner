@@ -81,7 +81,7 @@ export class SpecRunner {
           script: quote(line ? [fileName, ':', line].join('') : fileName),
           env: {...this.config.rspecEnv, ...this.config.rspecDebugEnv},
           args: [
-            `-f ${this.config.rspecFormat}`,
+            `-f ${this.getRspecFormat(line)}`,
             this.config.rspecDecorateEditorWithResults ? `-f j --out ${quote(this.outputFilePath)}` : undefined
           ].filter(Boolean),
           askParameters: false,
@@ -96,7 +96,7 @@ export class SpecRunner {
           request: 'launch',
           program: [
             this.config.rspecCommand,
-            `-f ${this.config.rspecFormat}`,
+            `-f ${this.getRspecFormat(line)}`,
             this.config.rspecDecorateEditorWithResults ? `-f j --out ${quote(this.outputFilePath)}` : undefined,
             quote(line ? [fileName, ':', line].join('') : fileName)
           ].filter(Boolean).join(' '),
@@ -114,7 +114,7 @@ export class SpecRunner {
   private buildRspecCommand(fileName: string, failedOnly: boolean, line?: number, testName?: string) {
     const file = line ? [fileName, ':', line].join('') : fileName;
     const failedOnlyModifier = failedOnly ? '--only-failures' : '';
-    const format = `-f ${this.config.rspecFormat}`;
+    const format = `-f ${this.getRspecFormat(line)}`;
     const jsonOutput = this.config.rspecDecorateEditorWithResults ? `-f j --out ${quote(this.outputFilePath)}` : '';
 
     const [cdCommand, returnCommand] = this.buildChangeDirectoryToWorkspaceRootCommand();
@@ -156,6 +156,10 @@ export class SpecRunner {
     }
 
     return this._term;
+  }
+
+  private getRspecFormat(line?: number): string {
+    return line ? this.config.rspecSingleLineFormat : this.config.rspecFormat;
   }
 };
 
