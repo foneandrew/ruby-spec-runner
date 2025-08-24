@@ -2,6 +2,12 @@
 
 All notable changes to the "spec-runner" extension will be documented in this file.
 
+## [4.2.0]
+
+- @rcoopr - Focus debug console when debugging (#14)
+- @rcoopr - Add separate formatter config for single line runs (#15)
+  - Configurable via new config item `ruby-spec-runner.rspecSingleLineFormat`
+
 ## [4.1.0]
 
 - Add config item `ruby-spec-runner.outputFilePath` to aid with running rspec via guard.

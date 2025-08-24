@@ -48,6 +48,7 @@ This extension contributes the following settings:
 - `ruby-spec-runner.changeDirectoryToWorkspaceRoot`: When true the test command will cd to workspace root first
 - `ruby-spec-runner.projectPath`: Override the root project path
 - `ruby-spec-runner.rspecFormat`: Configure rspec's terminal output format
+- `ruby-spec-runner.rspecSingleLineFormat`: Configure rspec's terminal output format for single line executions
 - `ruby-spec-runner.saveBeforeRunning`: When true the test file is saved before it is run
 - `ruby-spec-runner.rspecRunButton`: Show a run button in the status bar
 - `ruby-spec-runner.rspecDebugButton`: Show a debug button in the status bar
